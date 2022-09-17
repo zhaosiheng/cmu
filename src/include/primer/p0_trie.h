@@ -122,6 +122,8 @@ public:
      * @return Pointer to unique_ptr of the inserted child node. If insertion fails, return nullptr.
      */
     std::unique_ptr<TrieNode>* InsertChildNode(char key_char, std::unique_ptr<TrieNode>&& child) {
+    	if(key_char != child->GetKeyChar()) return nullptr;
+    	if(children_.count(key_char) > 0) return nullptr;
         children_[key_char] = std::move(child);
         return &children_[key_char];
     }
@@ -253,7 +255,7 @@ private:
     /* Root node of the trie */
     std::unique_ptr<TrieNode> root_;
     /* Read-write lock for the trie */
-    //ReaderWriterLatch latch_;
+    ReaderWriterLatch latch_;
 
 public:
     /**
@@ -358,7 +360,7 @@ public:
         if (ptr->get()->HasChild(s[0])) {//may find
             auto next = ptr->get()->GetChildNode(s[0]);
             if (Remove(s.substr(1), next)) {//delete success
-                if (!next->get()->HasChildren()) {//can delete
+                if (!next->get()->HasChildren() && !next->get()->IsEndNode()) {//can delete
                     ptr->get()->RemoveChildNode(s[0]);
                 }
                 return true;
