@@ -227,7 +227,9 @@ public:
      * @param key_char Key char of this node
      * @param value Value of this node
      */
-    TrieNodeWithValue(char key_char, T value) :is_end_(true), value_(value), key_char_(key_char) {}
+    TrieNodeWithValue(char key_char, T value) :TrieNode(key_char), value_(value){
+        SetEndNode(true);
+    }
 
     /**
      * @brief Destroy the Trie Node With Value object
