@@ -267,35 +267,9 @@ public:
     Trie() {
         root_ = std::make_unique<TrieNode>('\0');
     };
-
-    /**
-     * TODO(P0): Add implementation
-     *
-     * @brief Insert key-value pair into the trie.
-     *
-     * If key is empty string, return false immediately.
-     *
-     * If key alreadys exists, return false. Duplicated keys are not allowed and
-     * you should never overwrite value of an existing key.
-     *
-     * When you reach the ending character of a key:
-     * 1. If TrieNode with this ending character does not exist, create new TrieNodeWithValue
-     * and add it to parent node's children_ map.
-     * 2. If the terminal node is a TrieNode, then convert it into TrieNodeWithValue by
-     * invoking the appropriate constructor.
-     * 3. If it is already a TrieNodeWithValue,
-     * then insertion fails and return false. Do not overwrite existing data with new data.
-     *
-     * You can quickly check whether a TrieNode pointer holds TrieNode or TrieNodeWithValue
-     * by checking the is_end_ flag. If is_end_ == false, then it points to TrieNode. If
-     * is_end_ == true, it points to TrieNodeWithValue.
-     *
-     * @param key Key used to traverse the trie and find correct node
-     * @param value Value to be inserted
-     * @return True if insertion succeeds, false if key already exists
-     */
+    
     template <typename T>
-    bool Insert(const std::string& key, T value) {
+    bool insertInner(const std::string& key, T value) {
         if (key.empty()) {
             return false;
         }
@@ -324,9 +298,73 @@ public:
             parent->get()->RemoveChildNode(ch);
             parent->get()->InsertChildNode(ch, std::move(tmp));
             return true;
-        }
+        }    
+    }
+    /**
+     * TODO(P0): Add implementation
+     *
+     * @brief Insert key-value pair into the trie.
+     *
+     * If key is empty string, return false immediately.
+     *
+     * If key alreadys exists, return false. Duplicated keys are not allowed and
+     * you should never overwrite value of an existing key.
+     *
+     * When you reach the ending character of a key:
+     * 1. If TrieNode with this ending character does not exist, create new TrieNodeWithValue
+     * and add it to parent node's children_ map.
+     * 2. If the terminal node is a TrieNode, then convert it into TrieNodeWithValue by
+     * invoking the appropriate constructor.
+     * 3. If it is already a TrieNodeWithValue,
+     * then insertion fails and return false. Do not overwrite existing data with new data.
+     *
+     * You can quickly check whether a TrieNode pointer holds TrieNode or TrieNodeWithValue
+     * by checking the is_end_ flag. If is_end_ == false, then it points to TrieNode. If
+     * is_end_ == true, it points to TrieNodeWithValue.
+     *
+     * @param key Key used to traverse the trie and find correct node
+     * @param value Value to be inserted
+     * @return True if insertion succeeds, false if key already exists
+     */
+    template <typename T>
+    bool Insert(const std::string& key, T value) {
+        latch_.WLock();
+	bool rs = insertInner<T>(key, value);
+        latch_.WUnlock();
+        return rs;
 
     }
+    
+    bool removeInner(const std::string& key, std::unique_ptr<TrieNode>* ptr = nullptr){
+        if (!ptr) {//install
+            ptr = &this->root_;
+        }
+        std::string s = key;
+        if (s.empty() && ptr->get()->IsEndNode()) {//find
+            ptr->get()->SetEndNode(false);
+            return true;
+        }
+        else if (s.empty() && !ptr->get()->IsEndNode()) {//finally not find
+            return false;
+        }
+        if (ptr->get()->HasChild(s[0])) {//may find
+            auto next = ptr->get()->GetChildNode(s[0]);
+            if (removeInner(s.substr(1), next)) {//delete success
+                if (!next->get()->HasChildren() && !next->get()->IsEndNode()) {//can delete
+                    ptr->get()->RemoveChildNode(s[0]);
+                }
+                return true;
+            }
+            else {//not find
+                return false;
+            }
+        }
+        else {//not find
+            return false;
+        }
+    
+    }
+    
 
     /**
      * TODO(P0): Add implementation
@@ -346,46 +384,10 @@ public:
      * @return True if key exists and is removed, false otherwise
      */
     bool Remove(const std::string& key, std::unique_ptr<TrieNode>* ptr = nullptr) {
-        if (!ptr) {//install
-            ptr = &this->root_;
-        }
-        std::string s = key;
-        if (s.empty() && ptr->get()->IsEndNode()) {//find
-            ptr->get()->SetEndNode(false);
-            return true;
-        }
-        else if (s.empty() && !ptr->get()->IsEndNode()) {//finally not find
-            return false;
-        }
-        if (ptr->get()->HasChild(s[0])) {//may find
-            auto next = ptr->get()->GetChildNode(s[0]);
-            if (Remove(s.substr(1), next)) {//delete success
-                if (!next->get()->HasChildren() && !next->get()->IsEndNode()) {//can delete
-                    ptr->get()->RemoveChildNode(s[0]);
-                }
-                return true;
-            }
-            else {//not find
-                return false;
-            }
-        }
-        else {//not find
-            return false;
-        }
-        /*
-        char ch = ptr->get()->GetKeyChar();
-        if (ch == s[0]) {
-            if (Remove(s.substr(1), ptr->get()->GetChildNode(ch))) {//delete success
-                ptr->get()->RemoveChildNode(ch);
-                if (!ptr->get()->HasChildren()) {
-                    delete ptr->get();
-                }
-                return true;
-            }
-            else {//not find
-                return false;
-            }
-        }*/
+	latch_.WLock();
+	bool rs = removeInner(key, ptr);
+	latch_.WUnlock();
+	return rs;
     }
         /**
          * TODO(P0): Add implementation
@@ -406,7 +408,7 @@ public:
          * @return Value of type T if type matches
          */
         template <typename T>
-        T GetValue(const std::string & key, bool* success) {
+        T getValueInner(const std::string & key, bool* success) {  
             if (key.empty()) {
                 *success = false;
                 return {};
@@ -434,7 +436,14 @@ public:
             else {
                 *success = false;
                 return {};
-            }
+            }        
+        }
+        template <typename T>
+        T GetValue(const std::string & key, bool* success) {
+            latch_.RLock();
+            T rs = getValueInner<T>(key, success);
+            latch_.RUnlock();
+            return rs;
         }
 };
 }  // namespace bustub
