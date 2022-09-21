@@ -17,6 +17,8 @@
 #include <mutex>  // NOLINT
 #include <unordered_map>
 #include <vector>
+#include <cstdlib>
+#include<algorithm>
 
 #include "common/config.h"
 #include "common/macros.h"
@@ -140,6 +142,7 @@ class LRUKReplacer {
   [[maybe_unused]] size_t replacer_size_;
   [[maybe_unused]] size_t k_;
   std::vector<std::pair<int,bool>> my_buffer_;
+  std::vector<std::pair<int,bool>> my_buffer_k;
   std::mutex latch_;
 };
 
