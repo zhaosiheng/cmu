@@ -24,6 +24,6 @@ void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {}
 
 void LRUKReplacer::Remove(frame_id_t frame_id) {}
 
-auto LRUKReplacer::Size() -> size_t { return 0; }
+auto LRUKReplacer::Size() -> size_t { return current_timestamp_; }
 
 }  // namespace bustub
