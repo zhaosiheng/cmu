@@ -24,7 +24,11 @@
 #include "common/macros.h"
 
 namespace bustub {
-
+struct timestamp{
+  frame_id_t id;
+  int times;
+  bool evictable;
+}
 /**
  * LRUKReplacer implements the LRU-k replacement policy.
  *
@@ -141,8 +145,8 @@ class LRUKReplacer {
   [[maybe_unused]] size_t curr_size_{0};
   [[maybe_unused]] size_t replacer_size_;
   [[maybe_unused]] size_t k_;
-  std::vector<std::pair<int,bool>> my_buffer_;
-  std::vector<std::pair<int,bool>> my_buffer_k;
+  std::vector<timestamp> my_buffer_;
+  std::vector<timestamp> my_buffer_k;
   std::mutex latch_;
 };
 
