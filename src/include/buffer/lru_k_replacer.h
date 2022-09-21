@@ -139,6 +139,7 @@ class LRUKReplacer {
   [[maybe_unused]] size_t curr_size_{0};
   [[maybe_unused]] size_t replacer_size_;
   [[maybe_unused]] size_t k_;
+  std::vector<std::pair<int,bool>> container;
   std::mutex latch_;
 };
 
