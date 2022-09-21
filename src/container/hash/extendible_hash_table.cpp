@@ -95,15 +95,15 @@ void ExtendibleHashTable<K, V>::Insert(const K& key, const V& value) {
             global_depth_++;
             ptr->IncrementDepth();
             //split
-            int cap = dir_.size();
+            size_t cap = dir_.size();
             dir_.resize(cap * 2);
-            for (int i = 0; i < cap; i++) {
+            for (size_t i = 0; i < cap; i++) {
                 dir_[i + cap] = dir_[i];
             }
             //redistribute
             std::shared_ptr<Bucket> new_bucket = std::make_shared<Bucket>(bucket_size_, ptr->GetDepth());
             dir_[index + cap] = new_bucket;
-            for (int i = 0; i < bucket_size_; i++) {
+            for (size_t i = 0; i < bucket_size_; i++) {
                 auto kv = ptr->GetItems().front();
                 ptr->GetItems().pop_front();
                 size_t idx = IndexOf(kv.first);
@@ -113,10 +113,10 @@ void ExtendibleHashTable<K, V>::Insert(const K& key, const V& value) {
         }
         else {//L<G
             ptr->IncrementDepth();
-            int cap = dir_.size() / 2;
+            size_t cap = dir_.size() / 2;
             //redistribute
             std::shared_ptr<Bucket> new_bucket = std::make_shared<Bucket>(bucket_size_, ptr->GetDepth());
-            for (int i = 0; i < bucket_size_ / 2; i++) {
+            for (size_t i = 0; i < bucket_size_ / 2; i++) {
                 auto kv = ptr->GetItems().front();
                 ptr->GetItems().pop_front();
                 new_bucket->GetItems().push_back(kv);
