@@ -39,12 +39,14 @@ private:
 	//front->q1(unevictable)->q2->q3(queue)->k1->k2(k_queue)->back
 	int _size_;
 	int cur;
+	int others;
 	int k;
 public:
 	my_list(int size,int k){
 		_size_ = size;
 		k = k;
 		cur = 0;
+		others=0;
 		front_ = new node(-1);
 		back_ = new node(-1);
 		front_->next = back_;
@@ -90,7 +92,7 @@ public:
 		if (!it) {
 			//not found
 			node* tmp = new node(id);
-			if (cur >= _size_) {
+			if (cur + others >= _size_) {
 				//need evict
 				node* p = front_->next;
 				while (!p->evictable) {
@@ -112,14 +114,18 @@ public:
 			}
 		}
 	}
-	void evcit(frame_id_t &id) {
+	bool evcit(frame_id_t *id) {
 		node* p = front_->next;
 		while (!p->evictable) {
 			p = p->next;
 		}
-		id = p->id;
+		if(p==back_){
+			return false;
+		}
+		*id = p->id;
 		del(p);
 		delete p;
+		return true;
 	}
 	void remove(frame_id_t id) {
 		node* it = find(id);
@@ -133,9 +139,11 @@ public:
 		if (it) {
 			if (it->evictable && !evictable) {
 				cur--;
+				others++;
 			}
 			else if (!(it->evictable) && evictable) {
 				cur++;
+				others--;
 			}
 			it->evictable = evictable;
 		}
