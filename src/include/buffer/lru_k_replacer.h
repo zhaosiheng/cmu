@@ -19,6 +19,7 @@
 #include <vector>
 #include <cstdlib>
 #include<algorithm>
+#include <iostream>
 
 #include "common/config.h"
 #include "common/macros.h"
@@ -42,9 +43,9 @@ private:
 	int others;
 	int k;
 public:
-	my_list(int size,int k){
+	my_list(int size,int k_){
 		_size_ = size;
-		k = k;
+		k = k_;
 		cur = 0;
 		others=0;
 		front_ = new node(-1);
@@ -74,6 +75,10 @@ public:
 		tar->pre = first;
 		tar->next = second;
 		//
+		if(tar->times >=k){
+			std::cout<<"tar:"<<tar->times<<"k:"<<k;
+			return;
+		}
 		if (queue == first) {
 			queue = tar;
 		}
@@ -150,6 +155,17 @@ public:
 	}
 	int get_cur() {
 		return cur;
+	}
+	void print(){
+		node *p=front_->next;
+		while(p!=back_){
+			std::cout<<p->id<<" times:"<<p->times<<"\n";
+			p=p->next;
+		}
+		std::cout<<"end\n";
+	}
+	void p_q(){
+		std::cout<<queue->id<<" times:"<<queue->times;
 	}
 };
 
@@ -261,6 +277,10 @@ class LRUKReplacer {
    * @return size_t
    */
   auto Size() -> size_t;
+  
+  my_list* get(){
+  	return lst;
+  }
 
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
