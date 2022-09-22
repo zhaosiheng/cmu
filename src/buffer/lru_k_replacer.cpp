@@ -20,27 +20,27 @@ LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : replacer_size_(num_fra
 
 auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
     std::scoped_lock sl(latch_);
-    return my_list->evcit(frame_id);
+    return lst->evcit(frame_id);
 }
 
 void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
    std::scoped_lock sl(latch_);
-   my_list->add(frame_id);
+   lst->add(frame_id);
 }
 
 void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {
     std::scoped_lock sl(latch_);
-    my_list->set(frame_id,set_evictable);
+    lst->set(frame_id,set_evictable);
 }
 
 void LRUKReplacer::Remove(frame_id_t frame_id) {
     std::scoped_lock sl(latch_);
-    my_list->remove(frame_id);
+    lst->remove(frame_id);
 }
 
 auto LRUKReplacer::Size() -> size_t { 
     std::scoped_lock sl(latch_);
-    return my_list->get();
+    return lst->get_cur();
 }
 
 }  // namespace bustub
