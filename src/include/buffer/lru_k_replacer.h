@@ -24,11 +24,127 @@
 #include "common/macros.h"
 
 namespace bustub {
-struct timestamp{
-  frame_id_t id;
-  int times;
-  bool evictable;
-}
+struct node {
+	int times;
+	frame_id_t id;
+	bool evictable;
+	node* next, * pre;
+	node(int id,int times=1) :times(times),evictable(true), id(id),next(nullptr),pre(nullptr) {}
+	
+};
+
+class my_list {
+private:
+	node* front_, * back_, * queue, * k_queue, * evict;
+	//front->q1(unevictable)->q2->q3(queue)->k1->k2(k_queue)->back
+	int _size_;
+	int cur;
+	int k;
+public:
+	my_list(int size,int k){
+		_size_ = size;
+		k = k;
+		cur = 0;
+		front_ = new node(-1);
+		back_ = new node(-1);
+		front_->next = back_;
+		back_->pre = front_;
+		//
+		queue  = front_;
+		k_queue = back_;
+	}
+	~my_list(){}
+	node* find(frame_id_t id) {
+		node* p = front_->next;
+		while (p != back_) {
+			if (p->id == id) {
+				return p;
+			}
+			p = p->next;
+		}
+		return nullptr;
+
+	}
+	void insert(node* first, node* second, node* tar) {
+		cur++;
+		first->next = tar;
+		second->pre = tar;
+		tar->pre = first;
+		tar->next = second;
+		//
+		if (queue == first) {
+			queue = tar;
+		}
+	}
+	void del(node* tar) {
+		tar->pre->next = tar->next;
+		tar->next->pre = tar->pre;
+		cur--;
+		//
+		if (queue == tar) {
+			queue = tar->pre;
+		}
+	}
+	void add(frame_id_t id) {
+		node* it = find(id);
+		if (!it) {
+			//not found
+			node* tmp = new node(id);
+			if (cur >= _size_) {
+				//need evict
+				node* p = front_->next;
+				while (!p->evictable) {
+					p = p->next;
+				}
+				del(p);
+			}
+			insert(queue, queue->next, tmp);
+		}
+		else{
+			if (++(it->times) < k) {
+				del(it);
+				insert(queue, queue->next, it);
+			}
+			else {
+				del(it);
+				insert(k_queue->pre, k_queue, it);
+				//k_queue = it;
+			}
+		}
+	}
+	void evcit(frame_id_t &id) {
+		node* p = front_->next;
+		while (!p->evictable) {
+			p = p->next;
+		}
+		id = p->id;
+		del(p);
+		delete p;
+	}
+	void remove(frame_id_t id) {
+		node* it = find(id);
+		if (it) {
+			del(it);
+			delete it;
+		}
+	}
+	void set(frame_id_t id,bool evictable) {
+		node* it = find(id);
+		if (it) {
+			if (it->evictable && !evictable) {
+				cur--;
+			}
+			else if (!(it->evictable) && evictable) {
+				cur++;
+			}
+			it->evictable = evictable;
+		}
+	}
+	int get_cur() {
+		return cur;
+	}
+};
+
 /**
  * LRUKReplacer implements the LRU-k replacement policy.
  *
@@ -145,8 +261,7 @@ class LRUKReplacer {
   [[maybe_unused]] size_t curr_size_{0};
   [[maybe_unused]] size_t replacer_size_;
   [[maybe_unused]] size_t k_;
-  std::vector<timestamp> my_buffer_;
-  std::vector<timestamp> my_buffer_k;
+  my_list lst;
   std::mutex latch_;
 };
 
