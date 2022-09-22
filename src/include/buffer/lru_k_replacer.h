@@ -27,9 +27,9 @@ namespace bustub {
 struct node {
 	int times;
 	frame_id_t id;
-	bool evictable;
+	bool evictable = true;
 	node* next, * pre;
-	node(int id,int times=1) :times(times),evictable(true), id(id),next(nullptr),pre(nullptr) {}
+	node(frame_id_t id,int times=1) :times(times),id(id),next(nullptr),pre(nullptr) {}
 	
 };
 
