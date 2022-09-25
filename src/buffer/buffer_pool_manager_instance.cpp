@@ -100,7 +100,7 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t pid) -> Page * {
 
 auto BufferPoolManagerInstance::UnpinPgImp(page_id_t page_id, bool is_dirty) -> bool {
   std::scoped_lock lock{latch_};
-  frame_id_t fid;
+  frame_id_t &fid;
   if(!page_table_->Find(page_id,fid)){
     return false;
   }
@@ -119,7 +119,7 @@ auto BufferPoolManagerInstance::UnpinPgImp(page_id_t page_id, bool is_dirty) -> 
 
 auto BufferPoolManagerInstance::FlushPgImp(page_id_t page_id) -> bool {
   std::scoped_lock lock{latch_};
-  frame_id_t fid;
+  frame_id_t &fid;
   if(!page_table_->Find(page_id,fid) || page_id == INVALID_PAGE_ID){
     return false;
   }
@@ -136,7 +136,27 @@ void BufferPoolManagerInstance::FlushAllPgsImp() {
   }
 }
 
-auto BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) -> bool { return false; }
+auto BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) -> bool {
+  std::scoped_lock lock{latch_};
+  frame_id_t &fid;
+  if(!page_table_->Find(page_id,fid)){
+    return true;
+  }
+  Page *p = &pages_[fid];
+  if(p->GetPinCount() > 0){
+    return false;
+  }
+  if(p->IsDirty()){
+    disk_manager_->WritePage(page_id, page->GetData());
+  }
+  disk_manager_->DeallocatePage(page_id);
+  page_table_->Remove(page_id);
+  p->page_id_ = INVALID_PAGE_ID;
+  p->pin_count_ = 0;
+  p->is_dirty_ = false;
+  free_list_.push_back(fid);
+  return true;
+}
 
 auto BufferPoolManagerInstance::AllocatePage() -> page_id_t { return next_page_id_++; }
 
