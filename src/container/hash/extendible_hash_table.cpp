@@ -92,11 +92,13 @@ void ExtendibleHashTable<K, V>::Insert(const K& key, const V& value) {
     }
     else {//fail
         if (ptr->GetDepth() == global_depth_) {//L==G
+        //std::cout<<"L==G\n";
             global_depth_++;
             ptr->IncrementDepth();
             //split
             size_t cap = dir_.size();
             dir_.resize(cap * 2);
+            num_buckets_*=2;
             for (size_t i = 0; i < cap; i++) {
                 dir_[i + cap] = dir_[i];
             }
@@ -112,16 +114,20 @@ void ExtendibleHashTable<K, V>::Insert(const K& key, const V& value) {
 
         }
         else {//L<G
+        //std::cout<<"L<G\n";
             ptr->IncrementDepth();
             size_t cap = dir_.size() / 2;
             //redistribute
             std::shared_ptr<Bucket> new_bucket = std::make_shared<Bucket>(bucket_size_, ptr->GetDepth());
-            for (size_t i = 0; i < bucket_size_ / 2; i++) {
+            
+            dir_[(index + cap)%dir_.size()] = new_bucket;
+            for (size_t i = 0; i < bucket_size_; i++) {
                 auto kv = ptr->GetItems().front();
                 ptr->GetItems().pop_front();
-                new_bucket->GetItems().push_back(kv);
+                size_t idx = IndexOf(kv.first);
+                dir_[idx]->GetItems().push_back(kv);
             }
-            dir_[(index + cap)%dir_.size()] = new_bucket;
+
         }
         //add kv
         index = IndexOf(key);
