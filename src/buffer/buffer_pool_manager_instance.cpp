@@ -48,15 +48,15 @@ auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * {
   }
 
   Page *p = &pages_[fid];
-  if(p->IsDirty()){
+  if(p->is_dirty_){
     disk_manager_->WritePage(p->page_id_, p->GetData());
   }
-  page_table_->Remove(p->GetPageId());
+  page_table_->Remove(p->page_id_);
   //reset
   *page_id = AllocatePage();
-  p->GetPinCount() = 1;
-  p->GetPageId() = *page_id;
-  p->IsDirty() = false;
+  p->pin_count_ = 1;
+  p->page_id_ = *page_id;
+  p->is_dirty_ = false;
   page_table_->insert(*page_id , fid);
   replacer_->RecordAccess(fid);
   replacer_->SetEvictable(fid , false);
@@ -71,7 +71,7 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t pid) -> Page * {
   if(page_table_->Find(pid , &fid)){
     replacer_->RecordAccess(fid);
     replacer_->SetEvictable(fid , false);
-    pages_[fid].GetPinCount()++;
+    pages_[fid].pin_count_++;
     return &pages_[fid];
   }
   //
@@ -82,9 +82,9 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t pid) -> Page * {
     return nullptr;
   }
   Page *p = &pages_[fid];
-  p->GetPinCount() = 1;
-  p->GetPageId() = pid;
-  p->IsDirty() = false;
+  p->pin_count_ = 1;
+  p->page_id_ = pid;
+  p->is_dirty_ = false;
   disk_manager_->ReadPage(pid, p->GetData());
   replacer_->RecordAccess(fid);
   replacer_->SetEvictable(fid , false);
@@ -98,13 +98,13 @@ auto BufferPoolManagerInstance::UnpinPgImp(page_id_t page_id, bool is_dirty) -> 
     return false;
   }
   Page *p = &pages_[fid];
-  if(p->GetPinCount() <= 0){
+  if(p->pin_count_ <= 0){
     return false;
   }
   if(is_dirty){
-    p->IsDirty() = true;
+    p->is_dirty_ = true;
   }
-  if(--(p->GetPinCount()) == 0){
+  if(--(p->pin_count_) == 0){
     replacer_->SetEvictable(fid , true);
   }
   return true;
@@ -118,7 +118,7 @@ auto BufferPoolManagerInstance::FlushPgImp(page_id_t page_id) -> bool {
   }
   Page *p = &pages_[fid];
   disk_manager_->WritePage(page_id, page->GetData());
-  p->IsDirty() = false;
+  p->is_dirty_ = false;
   return true;
 }
 
@@ -136,10 +136,10 @@ auto BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) -> bool {
     return true;
   }
   Page *p = &pages_[fid];
-  if(p->GetPinCount() > 0){
+  if(p->pin_count_ > 0){
     return false;
   }
-  if(p->IsDirty()){
+  if(p->is_dirty_){
     disk_manager_->WritePage(page_id, page->GetData());
   }
   disk_manager_->DeallocatePage(page_id);
