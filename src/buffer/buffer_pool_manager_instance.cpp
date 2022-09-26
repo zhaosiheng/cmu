@@ -58,6 +58,7 @@ auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * {
   p->page_id_ = *page_id;
   p->is_dirty_ = false;
   page_table_->Insert(*page_id , fid);
+  
   replacer_->RecordAccess(fid);
   replacer_->SetEvictable(fid , false);
   //???
@@ -82,6 +83,7 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t pid) -> Page * {
     return nullptr;
   }
   Page *p = &pages_[fid];
+  page_table_->Insert(pid , fid);
   p->pin_count_ = 1;
   p->page_id_ = pid;
   p->is_dirty_ = false;
@@ -149,6 +151,7 @@ auto BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) -> bool {
   p->is_dirty_ = false;
   free_list_.push_back(fid);
   return true;
+  
 }
 
 auto BufferPoolManagerInstance::AllocatePage() -> page_id_t { return next_page_id_++; }
