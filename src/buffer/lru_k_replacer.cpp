@@ -14,16 +14,33 @@
 
 namespace bustub {
 
-LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : replacer_size_(num_frames), k_(k) {}
+LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : replacer_size_(num_frames), k_(k) {
+    lst = new my_list(num_frames,k);
+}
 
-auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool { return false; }
+auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
+    std::scoped_lock sl(latch_);
+    return lst->evcit(frame_id);
+}
 
-void LRUKReplacer::RecordAccess(frame_id_t frame_id) {}
+void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
+   std::scoped_lock sl(latch_);
+   lst->add(frame_id);
+}
 
-void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {}
+void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {
+    std::scoped_lock sl(latch_);
+    lst->set(frame_id,set_evictable);
+}
 
-void LRUKReplacer::Remove(frame_id_t frame_id) {}
+void LRUKReplacer::Remove(frame_id_t frame_id) {
+    std::scoped_lock sl(latch_);
+    lst->remove(frame_id);
+}
 
-auto LRUKReplacer::Size() -> size_t { return 0; }
+auto LRUKReplacer::Size() -> size_t { 
+    std::scoped_lock sl(latch_);
+    return lst->get_cur();
+}
 
 }  // namespace bustub

@@ -17,11 +17,157 @@
 #include <mutex>  // NOLINT
 #include <unordered_map>
 #include <vector>
+#include <cstdlib>
+#include<algorithm>
+#include <iostream>
 
 #include "common/config.h"
 #include "common/macros.h"
 
 namespace bustub {
+struct node {
+	int times;
+	frame_id_t id;
+	bool evictable = true;
+	node* next, * pre;
+	node(frame_id_t id,int times=1) :times(times),id(id),next(nullptr),pre(nullptr) {}
+	
+};
+
+class my_list {
+private:
+	node* front_, * back_, * queue, * k_queue, * evict;
+	//front->q1(unevictable)->q2->q3(queue)->k1->k2(k_queue)->back
+	int _size_;
+	int cur;
+	int others;
+	int k;
+public:
+	my_list(int size,int k_){
+		_size_ = size;
+		k = k_;
+		cur = 0;
+		others=0;
+		front_ = new node(-1);
+		back_ = new node(-1);
+		front_->next = back_;
+		back_->pre = front_;
+		//
+		queue  = front_;
+		k_queue = back_;
+	}
+	~my_list(){}
+	node* find(frame_id_t id) {
+		node* p = front_->next;
+		while (p != back_) {
+			if (p->id == id) {
+				return p;
+			}
+			p = p->next;
+		}
+		return nullptr;
+
+	}
+	void insert(node* first, node* second, node* tar) {
+		cur++;
+		first->next = tar;
+		second->pre = tar;
+		tar->pre = first;
+		tar->next = second;
+		//
+		if(tar->times >=k){
+			std::cout<<"tar:"<<tar->times<<"k:"<<k;
+			return;
+		}
+		if (queue == first) {
+			queue = tar;
+		}
+	}
+	void del(node* tar) {
+		tar->pre->next = tar->next;
+		tar->next->pre = tar->pre;
+		cur--;
+		//
+		if (queue == tar) {
+			queue = tar->pre;
+		}
+	}
+	void add(frame_id_t id) {
+		node* it = find(id);
+		if (!it) {
+			//not found
+			node* tmp = new node(id);
+			if (cur + others >= _size_) {
+				//need evict
+				node* p = front_->next;
+				while (!p->evictable) {
+					p = p->next;
+				}
+				del(p);
+			}
+			insert(queue, queue->next, tmp);
+		}
+		else{
+			if (++(it->times) < k) {
+				del(it);
+				insert(queue, queue->next, it);
+			}
+			else {
+				del(it);
+				insert(k_queue->pre, k_queue, it);
+				//k_queue = it;
+			}
+		}
+	}
+	bool evcit(frame_id_t *id) {
+		node* p = front_->next;
+		while (!p->evictable) {
+			p = p->next;
+		}
+		if(p==back_){
+			return false;
+		}
+		*id = p->id;
+		del(p);
+		delete p;
+		return true;
+	}
+	void remove(frame_id_t id) {
+		node* it = find(id);
+		if (it) {
+			del(it);
+			delete it;
+		}
+	}
+	void set(frame_id_t id,bool evictable) {
+		node* it = find(id);
+		if (it) {
+			if (it->evictable && !evictable) {
+				cur--;
+				others++;
+			}
+			else if (!(it->evictable) && evictable) {
+				cur++;
+				others--;
+			}
+			it->evictable = evictable;
+		}
+	}
+	int get_cur() {
+		return cur;
+	}
+	void print(){
+		node *p=front_->next;
+		while(p!=back_){
+			std::cout<<p->id<<" times:"<<p->times<<"\n";
+			p=p->next;
+		}
+		std::cout<<"end\n";
+	}
+	void p_q(){
+		std::cout<<queue->id<<" times:"<<queue->times;
+	}
+};
 
 /**
  * LRUKReplacer implements the LRU-k replacement policy.
@@ -131,6 +277,10 @@ class LRUKReplacer {
    * @return size_t
    */
   auto Size() -> size_t;
+  
+  my_list* get(){
+  	return lst;
+  }
 
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
@@ -139,6 +289,7 @@ class LRUKReplacer {
   [[maybe_unused]] size_t curr_size_{0};
   [[maybe_unused]] size_t replacer_size_;
   [[maybe_unused]] size_t k_;
+  my_list *lst;
   std::mutex latch_;
 };
 
