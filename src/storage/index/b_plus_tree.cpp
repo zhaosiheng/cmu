@@ -34,12 +34,36 @@ auto BPLUSTREE_TYPE::IsEmpty() const -> bool {
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result, Transaction *transaction) -> bool {
-  if(!IsEmpty()){
-    Page *page = buffer_pool_manager_->FetchPage(root_page_id_);
-    BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
+  if(IsEmpty()){
+    return false;
+  }
+  Page *page;
+  if(!(page = buffer_pool_manager_->FetchPage(root_page_id_))){
+    return false;
+  }
+  BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
+  buffer_pool_manager_->UnpinPage(root_page_id_, false);
+  while(t_page->IsRootPage()){
+    t_page = reinterpret_cast<BPlusTreeInternalPage*>(t_page);
+    page_id_t next_page_id = t_page->lookup(key, comparator_);
+    if(!(page = buffer_pool_manager_->FetchPage(next_page_id))){
+      return false;
+    }
+    t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
+    buffer_pool_manager_->UnpinPage(next_page_id, false);
+  }
+  if(!t_page->IsLeafPage()){
+    return false;
+  }
+  t_page = reinterpret_cast<BPlusTreeLeafPage*>(t_page);
+  ValueType v;
+  if(t_page->lookup(key, v, comparator_)){
+    result->push_back(v);
+    return true;
   }
   return false;
 }
+
 
 /*****************************************************************************
  * INSERTION
