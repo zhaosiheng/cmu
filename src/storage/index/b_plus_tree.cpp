@@ -38,26 +38,30 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
     return false;
   }
   Page *page;
+  /*internal->...->internal->*/
+  //fetch
   if(!(page = buffer_pool_manager_->FetchPage(root_page_id_))){
     return false;
   }
   BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
   buffer_pool_manager_->UnpinPage(root_page_id_, false);
+  //unpin
   while(t_page->IsRootPage()){
-    t_page = reinterpret_cast<BPlusTreeInternalPage*>(t_page);
-    page_id_t next_page_id = t_page->lookup(key, comparator_);
+    auto cur_page = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(t_page);
+    page_id_t next_page_id = cur_page->lookup(key, comparator_);
     if(!(page = buffer_pool_manager_->FetchPage(next_page_id))){
       return false;
     }
     t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
     buffer_pool_manager_->UnpinPage(next_page_id, false);
   }
+  /*->leaf*/
   if(!t_page->IsLeafPage()){
     return false;
   }
-  t_page = reinterpret_cast<BPlusTreeLeafPage*>(t_page);
+  auto cur_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(t_page);
   ValueType v;
-  if(t_page->lookup(key, v, comparator_)){
+  if(cur_page->lookup(key, v, comparator_)){
     result->push_back(v);
     return true;
   }
@@ -77,7 +81,45 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transaction *transaction) -> bool {
-  return false;
+  Page *page;
+  page_id_t pid;
+  if(IsEmpty()){
+    page = buffer_pool_manager_->NewPage(&pid);
+    assert(page != nullptr);
+    auto cur_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(page->GetData());
+    cur_page->Init(pid, INVALID_PAGE_ID, leaf_max_size_);
+    
+    //update_root
+    root_page_id_ = pid;
+    UpdateRootPageId(true);
+  }else{
+    page = buffer_pool_manager_->FetchPage(root_page_id_);
+    assert(page != nullptr);  
+  }
+  /*internal->...->internal->*/
+  BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
+  buffer_pool_manager_->UnpinPage(root_page_id_, false);
+  while(t_page->IsRootPage()){
+    auto cur_page = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(t_page);
+    page_id_t next_page_id = cur_page->lookup(key, comparator_);
+    if(!(page = buffer_pool_manager_->FetchPage(next_page_id))){
+      return false;
+    }
+    t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
+    buffer_pool_manager_->UnpinPage(next_page_id, false);
+  }
+  /*->leaf*/
+  auto cur_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(t_page);
+  ValueType v;
+  if(cur_page->lookup(key, v, comparator_)){/*insert duplicate keys*/
+    return false;
+  }
+  if(cur_page->insert(key, value)){
+    return true;
+  }else{/* out of leaf's maxsize*/
+    
+  }
+
 }
 
 /*****************************************************************************

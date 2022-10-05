@@ -60,6 +60,17 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     }
     return false;
   }
+  /*out of maxsize,return false*/
+  bool insert(const KeyType &key,ValueType &value){
+    array_[GetSize()].first = key;
+    array_[GetSize()].second = value;
+    IncreaseSize(1);
+    if(GetSize() > GetMaxSize()){
+      return false;
+    }else{
+      return true;
+    }
+  }
  private:
   page_id_t next_page_id_;
   // Flexible array member for page data.
