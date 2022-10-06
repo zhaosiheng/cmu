@@ -60,16 +60,46 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     }
     return false;
   }
-  /*out of maxsize,return false*/
-  bool insert(const KeyType &key,ValueType &value){
-    array_[GetSize()].first = key;
-    array_[GetSize()].second = value;
-    IncreaseSize(1);
-    if(GetSize() > GetMaxSize()){
-      return false;
-    }else{
-      return true;
+  /*if key already exist, return false*/
+  void insert(const KeyType &key,ValueType &value, const KeyComparator &comparator, BufferPoolManager* bgm){
+    int pos;//where need to insert
+    for(int i=0;i<GetSize();i++){
+      int rs = comparator(KeyAt(i), key);
+      if(rs == 0){
+        return false;
+      }else if(rs == -1){
+        pos = i;
+        break;
+      }
     }
+    /*m_size+1*/
+    IncreaseSize(1);
+    for(int i=GetSize()-1;i>pos;i--){
+      array_[i]=array_[i-1];
+    }
+    array_[pos].first = key;
+    array_[pos].second = value;
+
+    if(GetSize() > GetMaxSize()){/*out of maxsize*/
+      BPlusTreePage* page = pid_to_page(GetParentPageId(), bgm);
+      B_PLUS_TREE_INTERNAL_PAGE_TYPE *parent;
+      if(page){/*has parent*/
+        parent = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(page);
+      }else{/*no parent*/
+        parent = new_internal_page(bpm);
+      }
+      /*new_leaf, redistribute, parent+1*/
+      //new_leaf
+      auto next_page = new_leaf_page(bpm, &next_page_id_, GetParentPageId());
+      //redistribute
+      for(int i=0;i<GetMinSize();i++){
+        next_page->insert(array_[GetSize()-1].first, array_[GetSize()-1].second, bpm);
+        IncreaseSize(-1);
+      }
+      //parent+1: parent will judge wheather it need to split
+      parent->insert_key(next_page->KeyAt(0), next_page_id_, comparator, bpm);
+    }
+    return true;
   }
  private:
   page_id_t next_page_id_;

@@ -43,6 +43,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
   auto ValueAt(int index) const -> ValueType;
   //mine
   KeyType lookup(const KeyType &key, const KeyComparator &comparator){
+    /*array_[0]_is_invalid*/
     for(int i=1;i<GetSize();i++){
       int rs = comparator(KeyAt(i), key);
       if(rs == -1){
@@ -54,6 +55,9 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       }
       return ValueAt(GetSize() - 1);
     }
+  }
+  void insert_key(const KeyType &key, ValueType &value, const KeyComparator &comparator, BufferPoolManager* bgm){
+    
   }
 
  private:

@@ -110,18 +110,37 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   }
   /*->leaf*/
   auto cur_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(t_page);
-  ValueType v;
-  if(cur_page->lookup(key, v, comparator_)){/*insert duplicate keys*/
-    return false;
-  }
-  if(cur_page->insert(key, value)){
-    return true;
-  }else{/* out of leaf's maxsize*/
-    
-  }
-
+  /*insert into leaf*/
+  return cur_page->insert(key, value, comparator_, buffer_pool_manager_);
 }
 
+/*callback function*/
+BPlusTreePage* pid_to_page(page_id_t pid, BufferPoolManager* bpm){
+  Page *page = bpm->FetchPage(pid);
+  if(!page) return nullptr;
+  auto rs = reinterpret_cast<BPlusTreePage*>(page->GetData());
+  bpm->UnpinPage(pid, false);
+  return rs;
+}
+/*callback function*/
+B_PLUS_TREE_INTERNAL_PAGE_TYPE* new_internal_page(BufferPoolManager* bpm, page_id_t parent = INVALID_PAGE_ID){
+  page_id_t pid;
+  Page *page = bpm->NewPage(&pid);
+  assert(page != nullptr);
+  auto cur_page = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(page->GetData());
+  cur_page->Init(pid, parent, leaf_max_size_);
+  bpm->UnpinPage(pid, false);
+  return cur_page;
+}
+/*callback function*/
+B_PLUS_TREE_LEAF_PAGE_TYPE* new_leaf_page(BufferPoolManager* bpm, page_id_t &next_id, page_id_t parent = INVALID_PAGE_ID){
+  Page *page = bpm->NewPage(next_id);
+  assert(page != nullptr);
+  auto cur_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(page->GetData());
+  cur_page->Init(pid, parent, leaf_max_size_);
+  bpm->UnpinPage(pid, false);
+  return cur_page;
+}
 /*****************************************************************************
  * REMOVE
  *****************************************************************************/
