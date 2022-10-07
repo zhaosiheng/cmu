@@ -78,7 +78,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       BPlusTreePage* page = pid_to_page(GetParentPageId(), bgm);
       B_PLUS_TREE_INTERNAL_PAGE_TYPE *parent;
       if(page){/*has parent*/
-        parent = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(page);
+        parent = reinterpret_cast<BPLUSTREE_TYPE::InternalPage*>(page);
       }else{/*no parent*/
         parent = new_internal_page(name, bpm);
       }
