@@ -61,7 +61,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     return false;
   }
   /*if key already exist, return false*/
-  bool insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPLUSTREE_TYPE* tree){
+  bool insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree){
     int pos;//where need to insert
     for(int i=0;i<GetSize();i++){
       int rs = comparator(KeyAt(i), key);
