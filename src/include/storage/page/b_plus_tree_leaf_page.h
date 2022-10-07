@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "storage/page/b_plus_tree_page.h"
-
+#include "storage/index/b_plus_tree.h"
 namespace bustub {
 
 #define B_PLUS_TREE_LEAF_PAGE_TYPE BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>
@@ -61,7 +61,6 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     return false;
   }
   /*if key already exist, return false*/
-  INDEX_TEMPLATE_ARGUMENTS
   bool insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPLUSTREE_TYPE* tree){
     int pos;//where need to insert
     for(int i=0;i<GetSize();i++){

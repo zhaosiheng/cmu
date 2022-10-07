@@ -13,7 +13,7 @@
 #include <queue>
 
 #include "storage/page/b_plus_tree_page.h"
-
+#include "storage/index/b_plus_tree.h"
 namespace bustub {
 
 #define B_PLUS_TREE_INTERNAL_PAGE_TYPE BPlusTreeInternalPage<KeyType, ValueType, KeyComparator>
