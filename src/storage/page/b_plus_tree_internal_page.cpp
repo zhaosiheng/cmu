@@ -65,7 +65,8 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType {
   }
   return 0;
 }
-template <typename KeyType, typename ValueType, typename KeyComparator ,typename mValueType>
+INDEX_TEMPLATE_ARGUMENTS
+template<typename mValueType>
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
   int pos;/*where need to insert*/
   /*array_[0]_is_invalid*/
