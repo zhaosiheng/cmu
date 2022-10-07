@@ -61,7 +61,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     return false;
   }
   /*if key already exist, return false*/
-  void insert(const KeyType &key,ValueType &value, const KeyComparator &comparator, BufferPoolManager* bgm){
+  void insert(const KeyType &key,ValueType &value, const KeyComparator &comparator, BufferPoolManager* bgm, std::string name){
     int pos;//where need to insert
     for(int i=0;i<GetSize();i++){
       int rs = comparator(KeyAt(i), key);
@@ -86,11 +86,11 @@ class BPlusTreeLeafPage : public BPlusTreePage {
       if(page){/*has parent*/
         parent = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(page);
       }else{/*no parent*/
-        parent = new_internal_page(bpm);
+        parent = new_internal_page(name, bpm);
       }
       /*new_leaf, redistribute, parent+1*/
       //new_leaf
-      auto next_page = new_leaf_page(bpm, &next_page_id_, GetParentPageId());
+      auto next_page = new_leaf_page(name, bpm, &next_page_id_, GetParentPageId());
       //redistribute
       for(int i=0;i<GetMinSize();i++){
         next_page->insert(array_[GetSize()-1].first, array_[GetSize()-1].second, bpm);

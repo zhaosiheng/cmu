@@ -5,8 +5,10 @@
 #include "common/rid.h"
 #include "storage/index/b_plus_tree.h"
 #include "storage/page/header_page.h"
-
+#include <map>
 namespace bustub {
+/*global_config_map*/
+map<string, pair<int,int>> size_map;
 INDEX_TEMPLATE_ARGUMENTS
 BPLUSTREE_TYPE::BPlusTree(std::string name, BufferPoolManager *buffer_pool_manager, const KeyComparator &comparator,
                           int leaf_max_size, int internal_max_size)
@@ -15,7 +17,9 @@ BPLUSTREE_TYPE::BPlusTree(std::string name, BufferPoolManager *buffer_pool_manag
       buffer_pool_manager_(buffer_pool_manager),
       comparator_(comparator),
       leaf_max_size_(leaf_max_size),
-      internal_max_size_(internal_max_size) {}
+      internal_max_size_(internal_max_size) {
+        map.insert({name, {leaf_max_size, internal_max_size}});
+      }
 
 /*
  * Helper function to decide whether current b+tree is empty
@@ -47,7 +51,7 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
   buffer_pool_manager_->UnpinPage(root_page_id_, false);
   //unpin
   while(t_page->IsRootPage()){
-    auto cur_page = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(t_page);
+    auto cur_page = reinterpret_cast<InternalPage*>(t_page);
     page_id_t next_page_id = cur_page->lookup(key, comparator_);
     if(!(page = buffer_pool_manager_->FetchPage(next_page_id))){
       return false;
@@ -59,7 +63,7 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
   if(!t_page->IsLeafPage()){
     return false;
   }
-  auto cur_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(t_page);
+  auto cur_page = reinterpret_cast<LeafPage*>(t_page);
   ValueType v;
   if(cur_page->lookup(key, v, comparator_)){
     result->push_back(v);
@@ -86,7 +90,7 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   if(IsEmpty()){
     page = buffer_pool_manager_->NewPage(&pid);
     assert(page != nullptr);
-    auto cur_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(page->GetData());
+    auto cur_page = reinterpret_cast<LeafPage*>(page->GetData());
     cur_page->Init(pid, INVALID_PAGE_ID, leaf_max_size_);
     
     //update_root
@@ -100,7 +104,7 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
   buffer_pool_manager_->UnpinPage(root_page_id_, false);
   while(t_page->IsRootPage()){
-    auto cur_page = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(t_page);
+    auto cur_page = reinterpret_cast<InternalPage*>(t_page);
     page_id_t next_page_id = cur_page->lookup(key, comparator_);
     if(!(page = buffer_pool_manager_->FetchPage(next_page_id))){
       return false;
@@ -109,9 +113,9 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
     buffer_pool_manager_->UnpinPage(next_page_id, false);
   }
   /*->leaf*/
-  auto cur_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(t_page);
+  auto cur_page = reinterpret_cast<LeafPage*>(t_page);
   /*insert into leaf*/
-  return cur_page->insert(key, value, comparator_, buffer_pool_manager_);
+  return cur_page->insert(key, value, comparator_, buffer_pool_manager_, name);
 }
 
 /*callback function*/
@@ -123,21 +127,23 @@ BPlusTreePage* pid_to_page(page_id_t pid, BufferPoolManager* bpm){
   return rs;
 }
 /*callback function*/
-B_PLUS_TREE_INTERNAL_PAGE_TYPE* new_internal_page(BufferPoolManager* bpm, page_id_t parent = INVALID_PAGE_ID){
+INDEX_TEMPLATE_ARGUMENTS
+B_PLUS_TREE_INTERNAL_PAGE_TYPE* new_internal_page(std::string name, BufferPoolManager* bpm, page_id_t parent = INVALID_PAGE_ID){
   page_id_t pid;
   Page *page = bpm->NewPage(&pid);
   assert(page != nullptr);
-  auto cur_page = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(page->GetData());
-  cur_page->Init(pid, parent, leaf_max_size_);
+  auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::InternalPage*>(page->GetData());
+  cur_page->Init(pid, parent, map[name].second);
   bpm->UnpinPage(pid, false);
   return cur_page;
 }
 /*callback function*/
-B_PLUS_TREE_LEAF_PAGE_TYPE* new_leaf_page(BufferPoolManager* bpm, page_id_t &next_id, page_id_t parent = INVALID_PAGE_ID){
+INDEX_TEMPLATE_ARGUMENTS
+B_PLUS_TREE_LEAF_PAGE_TYPE* new_leaf_page(std::string name, BufferPoolManager* bpm, page_id_t &next_id, page_id_t parent = INVALID_PAGE_ID){
   Page *page = bpm->NewPage(next_id);
   assert(page != nullptr);
-  auto cur_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(page->GetData());
-  cur_page->Init(pid, parent, leaf_max_size_);
+  auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::LeafPage*>(page->GetData());
+  cur_page->Init(pid, parent, map[name].first);
   bpm->UnpinPage(pid, false);
   return cur_page;
 }
