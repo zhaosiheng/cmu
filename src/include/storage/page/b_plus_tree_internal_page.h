@@ -13,7 +13,7 @@
 #include <queue>
 
 #include "storage/page/b_plus_tree_page.h"
-#include "storage/index/b_plus_tree.h"
+//#include "storage/index/b_plus_tree.h"
 namespace bustub {
 template <typename KeyType, typename ValueType, typename KeyComparator>
 class BPlusTree;
