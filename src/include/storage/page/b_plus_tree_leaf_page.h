@@ -61,7 +61,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     }
     return false;
   }
-  bool insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPLUSTREE_TYPE* tree);
+  bool insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree);
  private:
   page_id_t next_page_id_;
   // Flexible array member for page data.
