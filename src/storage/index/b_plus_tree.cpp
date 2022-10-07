@@ -136,14 +136,14 @@ typename BPLUSTREE_TYPE::InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id
 }
 /*callback function*/
 INDEX_TEMPLATE_ARGUMENTS
-typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent = INVALID_PAGE_ID){
+typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent){
   page_id_t tmp;
   Page *page = buffer_pool_manager_->NewPage(&tmp);
   assert(page != nullptr);
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::LeafPage*>(page->GetData());
   cur_page->Init(tmp, parent, leaf_max_size_);
   cur_page->SetNextPageId(nnid);
-  buffer_pool_manager_->UnpinPage(pid, false);
+  buffer_pool_manager_->UnpinPage(tmp, false);
   nid = tmp;
   return cur_page;
 }
