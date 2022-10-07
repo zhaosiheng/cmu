@@ -14,9 +14,10 @@
 #include <vector>
 
 #include "storage/page/b_plus_tree_page.h"
-#include "storage/index/b_plus_tree.h"
-namespace bustub {
 
+namespace bustub {
+INDEX_TEMPLATE_ARGUMENTS
+class BPlusTree;
 #define B_PLUS_TREE_LEAF_PAGE_TYPE BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>
 #define LEAF_PAGE_HEADER_SIZE 28
 #define LEAF_PAGE_SIZE ((BUSTUB_PAGE_SIZE - LEAF_PAGE_HEADER_SIZE) / sizeof(MappingType))
