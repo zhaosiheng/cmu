@@ -55,9 +55,10 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       }else if(rs == 1){
         continue;
       }
-      return ValueAt(GetSize() - 1);
     }
+    return ValueAt(GetSize() - 1);
   }
+
   template<typename mValueType>
   void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree);
  private:

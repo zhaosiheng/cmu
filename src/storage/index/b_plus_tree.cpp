@@ -127,7 +127,7 @@ BPlusTreePage* BPLUSTREE_TYPE::pid_to_page(page_id_t pid){
 /*callback function*/
 INDEX_TEMPLATE_ARGUMENTS
 BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>* BPLUSTREE_TYPE::new_internal_page(page_id_t &nid, page_id_t parent = INVALID_PAGE_ID){
-  Page *page = buffer_pool_manager_->NewPage(nid);
+  Page *page = buffer_pool_manager_->NewPage(&nid);
   assert(page != nullptr);
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::InternalPage*>(page->GetData());
   cur_page->Init(nid, parent, internal_max_size_);
