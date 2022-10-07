@@ -13,7 +13,7 @@
 #include <queue>
 
 #include "storage/page/b_plus_tree_page.h"
-
+#include "storage/index/b_plus_tree.h"
 namespace bustub {
 template <typename KeyType, typename ValueType, typename KeyComparator>
 class BPlusTree;
@@ -60,7 +60,50 @@ class BPlusTreeInternalPage : public BPlusTreePage {
   }
 
   template<typename mValueType>
-  void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree);
+  void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
+    int pos;/*where need to insert*/
+    /*array_[0]_is_invalid*/
+    for(int i=1;i<GetSize();i++){
+      int rs = comparator(KeyAt(i), key);
+      if(rs == 1){
+        pos =i;
+        break;
+      }
+    }
+    /*m_size+1*/
+    IncreaseSize(1);
+    for(int i=GetSize()-1;i>pos;i--){
+      array_[i]=array_[i-1];
+    }
+    array_[pos].first = key;
+    array_[pos].second = value;
+
+    if(GetSize()>GetMaxSize()){/*out of maxsize*/
+      BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
+      typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
+      if(page){/*has parent*/
+        parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(page);
+      }else{/*no parent*/
+        page_id_t tmp;
+        parent = tree->new_internal_page(tmp);
+        tree->update_root(tmp);
+        SetParentPageId(tmp);
+      }
+      /*new_internal, redistribute, parent+1*/
+      //new_internal
+      page_id_t nid;
+      auto next_page = tree->new_internal_page(nid, GetParentPageId());
+      //redistribute
+      for(int i=0;i<GetMinSize();i++){
+        next_page->insert_key(array_[GetSize()-1].first, array_[GetSize()-1].second, comparator, tree);
+        IncreaseSize(-1);
+      }
+      //parent+1: parent will judge wheather it need to split
+      parent->insert_key(next_page->KeyAt(0), nid, comparator, tree);
+          
+    }
+    return;    
+  }
  private:
   // Flexible array member for page data.
   MappingType array_[1];
