@@ -60,7 +60,7 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::KeyAt(int index) const -> KeyType {
 
 /*if key already exist, return false*/
 INDEX_TEMPLATE_ARGUMENTS
-bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPLUSTREE_TYPE* tree){
+bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree){
   int pos;//where need to insert
   for(int i=0;i<GetSize();i++){
     int rs = comparator(KeyAt(i), key);
@@ -81,9 +81,9 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
 
   if(GetSize() > GetMaxSize()){/*out of maxsize*/
     BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
-    typename BPLUSTREE_TYPE::InternalPage *parent;
+    typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
     if(page){/*has parent*/
-      parent = reinterpret_cast<typename BPLUSTREE_TYPE::InternalPage*>(page);
+      parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(page);
     }else{/*no parent*/
       page_id_t tmp;
       parent = tree->new_internal_page(tmp);
