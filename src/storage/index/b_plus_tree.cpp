@@ -8,7 +8,6 @@
 #include <map>
 namespace bustub {
 /*global_config_map*/
-map<string, pair<int,int>> size_map;
 INDEX_TEMPLATE_ARGUMENTS
 BPLUSTREE_TYPE::BPlusTree(std::string name, BufferPoolManager *buffer_pool_manager, const KeyComparator &comparator,
                           int leaf_max_size, int internal_max_size)
@@ -119,32 +118,35 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
 }
 
 /*callback function*/
-BPlusTreePage* pid_to_page(page_id_t pid, BufferPoolManager* bpm){
-  Page *page = bpm->FetchPage(pid);
+INDEX_TEMPLATE_ARGUMENTS
+BPlusTreePage* BPLUSTREE_TYPE::pid_to_page(page_id_t pid){
+  Page *page = buffer_pool_manager_->FetchPage(pid);
   if(!page) return nullptr;
   auto rs = reinterpret_cast<BPlusTreePage*>(page->GetData());
-  bpm->UnpinPage(pid, false);
+  buffer_pool_manager_->UnpinPage(pid, false);
   return rs;
 }
 /*callback function*/
 INDEX_TEMPLATE_ARGUMENTS
-B_PLUS_TREE_INTERNAL_PAGE_TYPE* new_internal_page(std::string name, BufferPoolManager* bpm, page_id_t parent = INVALID_PAGE_ID){
-  page_id_t pid;
-  Page *page = bpm->NewPage(&pid);
+InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id_t &nid, page_id_t parent = INVALID_PAGE_ID){
+  Page *page = buffer_pool_manager_->NewPage(nid);
   assert(page != nullptr);
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::InternalPage*>(page->GetData());
-  cur_page->Init(pid, parent, map[name].second);
-  bpm->UnpinPage(pid, false);
+  cur_page->Init(nid, parent, internal_max_size_);
+  buffer_pool_manager_->UnpinPage(nid, false);
   return cur_page;
 }
 /*callback function*/
 INDEX_TEMPLATE_ARGUMENTS
-B_PLUS_TREE_LEAF_PAGE_TYPE* new_leaf_page(std::string name, BufferPoolManager* bpm, page_id_t &next_id, page_id_t parent = INVALID_PAGE_ID){
-  Page *page = bpm->NewPage(next_id);
+LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent = INVALID_PAGE_ID){
+  page_id_t tmp;
+  Page *page = buffer_pool_manager_->NewPage(&tmp);
   assert(page != nullptr);
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::LeafPage*>(page->GetData());
-  cur_page->Init(pid, parent, map[name].first);
-  bpm->UnpinPage(pid, false);
+  cur_page->Init(pid, parent, leaf_max_size_);
+  cur_page->SetNextPageId(nnid);
+  buffer_pool_manager_->UnpinPage(pid, false);
+  nid = tmp;
   return cur_page;
 }
 /*****************************************************************************

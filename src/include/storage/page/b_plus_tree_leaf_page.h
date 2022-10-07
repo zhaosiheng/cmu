@@ -61,7 +61,8 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     return false;
   }
   /*if key already exist, return false*/
-  bool insert(const KeyType &key,ValueType &value, const KeyComparator &comparator, BufferPoolManager* bgm, std::string name){
+  INDEX_TEMPLATE_ARGUMENTS
+  bool insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPLUSTREE_TYPE* tree){
     int pos;//where need to insert
     for(int i=0;i<GetSize();i++){
       int rs = comparator(KeyAt(i), key);
@@ -81,23 +82,28 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     array_[pos].second = value;
 
     if(GetSize() > GetMaxSize()){/*out of maxsize*/
-      BPlusTreePage* page = pid_to_page(GetParentPageId(), bgm);
+      BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
       BPLUSTREE_TYPE::InternalPage *parent;
       if(page){/*has parent*/
         parent = reinterpret_cast<BPLUSTREE_TYPE::InternalPage*>(page);
       }else{/*no parent*/
-        parent = new_internal_page(name, bpm);
+        page_id_t tmp;
+        parent = tree->new_internal_page(&tmp);
+        tree->UpdateRootPageId(tmp);
+        SetParentPageId(tmp);
       }
       /*new_leaf, redistribute, parent+1*/
       //new_leaf
-      auto next_page = new_leaf_page(name, bpm, &next_page_id_, GetParentPageId());
+      page_id_t nid;
+      auto next_page = tree->new_leaf_page(&nid, GetNextPageId(), GetParentPageId());
+      SetNextPageId(nid);
       //redistribute
       for(int i=0;i<GetMinSize();i++){
         next_page->insert(array_[GetSize()-1].first, array_[GetSize()-1].second, bpm);
         IncreaseSize(-1);
       }
       //parent+1: parent will judge wheather it need to split
-      parent->insert_key(next_page->KeyAt(0), next_page_id_, comparator, bpm);
+      parent->insert_key(next_page->KeyAt(0), nid, comparator);
     }
     return true;
   }

@@ -75,6 +75,10 @@ class BPlusTree {
   // read data from file and remove one by one
   void RemoveFromFile(const std::string &file_name, Transaction *transaction = nullptr);
 
+  /*callback function*/
+  BPlusTreePage* pid_to_page(page_id_t pid);
+  InternalPage* new_internal_page(page_id_t &nid, page_id_t parent = INVALID_PAGE_ID);
+  LeafPage* new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent = INVALID_PAGE_ID);
  private:
   void UpdateRootPageId(int insert_record = 0);
 
