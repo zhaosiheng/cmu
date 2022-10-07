@@ -126,7 +126,7 @@ BPlusTreePage* BPLUSTREE_TYPE::pid_to_page(page_id_t pid){
 }
 /*callback function*/
 INDEX_TEMPLATE_ARGUMENTS
-BPLUSTREE_TYPE::InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id_t &nid, page_id_t parent = INVALID_PAGE_ID){
+typename BPLUSTREE_TYPE::InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id_t &nid, page_id_t parent = INVALID_PAGE_ID){
   Page *page = buffer_pool_manager_->NewPage(&nid);
   assert(page != nullptr);
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::InternalPage*>(page->GetData());
@@ -136,7 +136,7 @@ BPLUSTREE_TYPE::InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id_t &nid, 
 }
 /*callback function*/
 INDEX_TEMPLATE_ARGUMENTS
-BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent = INVALID_PAGE_ID){
+typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent = INVALID_PAGE_ID){
   page_id_t tmp;
   Page *page = buffer_pool_manager_->NewPage(&tmp);
   assert(page != nullptr);
