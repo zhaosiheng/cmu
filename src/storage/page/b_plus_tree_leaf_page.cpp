@@ -16,7 +16,7 @@
 #include "storage/page/b_plus_tree_leaf_page.h"
 
 namespace bustub {
-#define BPLUSTREE_TYPE BPlusTree<KeyType, ValueType, KeyComparator>
+
 /*****************************************************************************
  * HELPER METHODS AND UTILITIES
  *****************************************************************************/
