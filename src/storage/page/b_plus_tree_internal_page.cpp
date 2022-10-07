@@ -92,14 +92,14 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::insert_key(const KeyType &key, const ValueT
       parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(page);
     }else{/*no parent*/
       page_id_t tmp;
-      parent = tree->new_internal_page(&tmp);
-      tree->UpdateRootPageId(tmp);
+      parent = tree->new_internal_page(tmp);
+      tree->update_root(tmp);
       SetParentPageId(tmp);
     }
     /*new_internal, redistribute, parent+1*/
     //new_internal
     page_id_t nid;
-    auto next_page = tree->new_internal_page(&nid, GetParentPageId());
+    auto next_page = tree->new_internal_page(nid, GetParentPageId());
     //redistribute
     for(int i=0;i<GetMinSize();i++){
       next_page->insert_key(array_[GetSize()-1].first, array_[GetSize()-1].second, comparator, tree);
