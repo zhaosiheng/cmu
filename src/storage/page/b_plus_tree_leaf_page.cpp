@@ -86,14 +86,14 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
       parent = reinterpret_cast<typename BPLUSTREE_TYPE::InternalPage*>(page);
     }else{/*no parent*/
       page_id_t tmp;
-      parent = tree->new_internal_page(&tmp);
-      tree->UpdateRootPageId(tmp);
+      parent = tree->new_internal_page(tmp);
+      tree->update_root(tmp);
       SetParentPageId(tmp);
     }
     /*new_leaf, redistribute, parent+1*/
     //new_leaf
     page_id_t nid;
-    auto next_page = tree->new_leaf_page(&nid, GetNextPageId(), GetParentPageId());
+    auto next_page = tree->new_leaf_page(nid, GetNextPageId(), GetParentPageId());
     SetNextPageId(nid);
     //redistribute
     for(int i=0;i<GetMinSize();i++){
