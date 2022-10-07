@@ -114,7 +114,7 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   /*->leaf*/
   auto cur_page = reinterpret_cast<LeafPage*>(t_page);
   /*insert into leaf*/
-  return cur_page->insert(key, value, comparator_, buffer_pool_manager_, name);
+  return cur_page->insert(key, value, comparator_, this);
 }
 
 /*callback function*/
