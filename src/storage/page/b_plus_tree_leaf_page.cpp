@@ -14,7 +14,7 @@
 #include "common/exception.h"
 #include "common/rid.h"
 #include "storage/page/b_plus_tree_leaf_page.h"
-#include "storage/index/b_plus_tree.h"
+
 namespace bustub {
 
 /*****************************************************************************
