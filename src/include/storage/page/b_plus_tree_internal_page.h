@@ -15,7 +15,7 @@
 #include "storage/page/b_plus_tree_page.h"
 
 namespace bustub {
-INDEX_TEMPLATE_ARGUMENTS
+template <typename KeyType, typename mValueType, typename KeyComparator>
 class BPlusTree;
 
 #define B_PLUS_TREE_INTERNAL_PAGE_TYPE BPlusTreeInternalPage<KeyType, ValueType, KeyComparator>
@@ -59,7 +59,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     }
   }
 
-  void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree);
+  void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree);
  private:
   // Flexible array member for page data.
   MappingType array_[1];
