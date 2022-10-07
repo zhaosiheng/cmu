@@ -102,7 +102,7 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::insert_key(const KeyType &key, const ValueT
     auto next_page = tree->new_internal_page(&nid, GetParentPageId());
     //redistribute
     for(int i=0;i<GetMinSize();i++){
-      next_page->insert_key(array_[GetSize()-1].first, array_[GetSize()-1].second, comparator, bpm);
+      next_page->insert_key(array_[GetSize()-1].first, array_[GetSize()-1].second, comparator, tree);
       IncreaseSize(-1);
     }
     //parent+1: parent will judge wheather it need to split
