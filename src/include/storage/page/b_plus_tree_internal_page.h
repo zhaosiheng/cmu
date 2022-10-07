@@ -76,7 +76,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
 
     if(GetSize()>GetMaxSize()){/*out of maxsize*/
       BPlusTreePage* page = pid_to_page(GetParentPageId(), bgm);
-      B_PLUS_TREE_INTERNAL_PAGE_TYPE *parent;
+      BPLUSTREE_TYPE::InternalPage *parent;
       if(page){/*has parent*/
         parent = reinterpret_cast<BPLUSTREE_TYPE::InternalPage*>(page);
       }else{/*no parent*/
