@@ -113,6 +113,12 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::insert_key(const KeyType &key, const ValueT
   }
   return;
 }
+#define SOLVE(x) BPlusTreeInternalPage<GenericKey<x>, page_id_t, GenericComparator<x>>::insert_key(const GenericKey<x>& key, const page_id_t &value,  GenericComparator<x> &comparator,BPlusTree<GenericKey<x>, RID, GenericComparator<x>>* tree)
+template void SOLVE(4);
+template void SOLVE(8);
+template void SOLVE(16);
+template void SOLVE(32);
+template void SOLVE(64);
 // valuetype for internalNode should be page id_t
 template class BPlusTreeInternalPage<GenericKey<4>, page_id_t, GenericComparator<4>>;
 template class BPlusTreeInternalPage<GenericKey<8>, page_id_t, GenericComparator<8>>;
