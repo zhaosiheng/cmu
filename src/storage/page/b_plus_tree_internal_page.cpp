@@ -29,7 +29,7 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id
   SetParentPageId(parent_id);
   SetPageId(page_id);
   SetMaxSize(max_size);
-  SetPageType(INTERNAL_PAGE);
+  SetPageType(IndexPageType::INTERNAL_PAGE);
 
   SetSize(0);
 }
@@ -65,7 +65,7 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType {
   }
   return 0;
 }
-INDEX_TEMPLATE_ARGUMENTS
+template <typename KeyType, typename ValueType, typename KeyComparator ,typename mValueType>
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
   int pos;/*where need to insert*/
   /*array_[0]_is_invalid*/
