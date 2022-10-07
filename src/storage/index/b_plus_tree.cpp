@@ -136,7 +136,7 @@ BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>* BPLUSTREE_TYPE::new_in
 }
 /*callback function*/
 INDEX_TEMPLATE_ARGUMENTS
-LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent = INVALID_PAGE_ID){
+BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent = INVALID_PAGE_ID){
   page_id_t tmp;
   Page *page = buffer_pool_manager_->NewPage(&tmp);
   assert(page != nullptr);
