@@ -56,7 +56,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       return ValueAt(GetSize() - 1);
     }
   }
-  void insert_key(const KeyType &key, ValueType &value, const KeyComparator &comparator, BufferPoolManager* bgm, std:;string name){
+  void insert_key(const KeyType &key, ValueType &value, const KeyComparator &comparator, BufferPoolManager* bgm, std::string name){
     int pos;/*where need to insert*/
     /*array_[0]_is_invalid*/
     for(int i=1;i<GetSize();i++){
