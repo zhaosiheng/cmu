@@ -61,12 +61,12 @@ class BPlusTreeInternalPage : public BPlusTreePage {
 
   template<typename mValueType>
   void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
-    int pos;/*where need to insert*/
+    int pos = 1;/*where need to insert*/
     /*array_[0]_is_invalid*/
     for(int i=1;i<GetSize();i++){
       int rs = comparator(KeyAt(i), key);
       if(rs == 1){
-        pos =i;
+        pos = i;
         break;
       }
     }
