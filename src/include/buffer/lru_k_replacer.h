@@ -56,7 +56,14 @@ public:
 		queue  = front_;
 		k_queue = back_;
 	}
-	~my_list(){}
+	~my_list(){
+		node* p = front_;
+		while(p != nullptr){
+			node *n = p->next;
+			delete p;
+			p = n;
+		}
+	}
 	node* find(frame_id_t id) {
 		node* p = front_->next;
 		while (p != back_) {
