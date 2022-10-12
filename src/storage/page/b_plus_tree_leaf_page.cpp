@@ -67,7 +67,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
     int rs = comparator(KeyAt(i), key);
     if(rs == 0){
       return false;
-    }else if(rs == -1){
+    }else if(rs == 1){
       pos = i;
       break;
     }
@@ -102,7 +102,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
       IncreaseSize(-1);
     }
     //parent+1: parent will judge wheather it need to split
-    parent->insert_key(next_page->KeyAt(0), nid, comparator, tree);
+    parent->insert_key(KeyAt(0), GetPageId(), next_page->KeyAt(0), nid, comparator, tree);
   }
   return true;
 }

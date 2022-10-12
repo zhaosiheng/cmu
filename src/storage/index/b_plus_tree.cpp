@@ -164,7 +164,27 @@ typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &nid,
  * necessary.
  */
 INDEX_TEMPLATE_ARGUMENTS
-void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {}
+void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
+  if(IsEmpty()) return;
+  Page *page = buffer_pool_manager_->FetchPage(root_page_id_);
+  assert(page != nullptr);
+  /*internal->...->internal->*/
+  BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
+  buffer_pool_manager_->UnpinPage(root_page_id_, false);
+  while(t_page->IsRootPage()){
+    auto cur_page = reinterpret_cast<InternalPage*>(t_page);
+    page_id_t next_page_id = cur_page->lookup(key, comparator_);
+    if(!(page = buffer_pool_manager_->FetchPage(next_page_id))){
+      return;
+    }
+    t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
+    buffer_pool_manager_->UnpinPage(next_page_id, false);
+  }
+  /*->leaf*/
+  auto cur_page = reinterpret_cast<LeafPage*>(t_page);
+  /*insert into leaf*/
+  return cur_page->remove(key, comparator_, this);  
+}
 
 /*****************************************************************************
  * INDEX ITERATOR

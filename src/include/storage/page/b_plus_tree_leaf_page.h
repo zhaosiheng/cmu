@@ -62,6 +62,26 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     return false;
   }
   bool insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree);
+  void remove(const KeyType &key, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree){
+    int pos = -1;
+    for(int i=0;i<GetSize();i++){
+      int rs = comparator(KeyAt(i), key);
+      if(rs == 0){
+        pos = i;
+      }
+    }
+    if(pos = -1)/*not find*/
+      return;
+    /*remove*/  
+    IncreaseSize(-1);
+    for(int i=pos;i<GetSize();i++){
+      array_[i] = array_[i+1];
+    }
+
+    if(GetSize()<GetMinSize()){
+      
+    }
+  }
  private:
   page_id_t next_page_id_;
   // Flexible array member for page data.

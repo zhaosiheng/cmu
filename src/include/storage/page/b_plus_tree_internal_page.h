@@ -48,35 +48,49 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     /*array_[0]_is_invalid*/
     for(int i=1;i<GetSize();i++){
       int rs = comparator(KeyAt(i), key);
-      if(rs == -1){
+      if(rs == 1){
         return ValueAt(i-1);
       }else if(rs == 0){
         return ValueAt(i);
-      }else if(rs == 1){
+      }else if(rs == -1){
         continue;
       }
     }
     return ValueAt(GetSize() - 1);
   }
+  ValueType get_sibling(const KeyType &key, const KeyComparator &comparator){
 
+  }
   template<typename mValueType>
-  void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
-    int pos = 1;/*where need to insert*/
+  void insert_key(const KeyType &l_key, const ValueType &l_value, const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
+    if(GetSize()==0){
+      IncreaseSize(2);
+      array_[GetSize()-1].first = key;
+      array_[GetSize()-1].second = value;
+
+      array_[0].first = l_key;
+      array_[0].second = l_value;     
+      return; 
+    }
+    int pos = 0 ;/*where need to insert*/
     /*array_[0]_is_invalid*/
     for(int i=1;i<GetSize();i++){
-      int rs = comparator(KeyAt(i), key);
-      if(rs == 1){
+      int rs = comparator(KeyAt(i), l_key);
+      if(rs == 0){
         pos = i;
+        break;
+      }else if(rs == 1){
+        pos = i-1;
         break;
       }
     }
     /*m_size+1*/
     IncreaseSize(1);
-    for(int i=GetSize()-1;i>pos;i--){
+    for(int i=GetSize()-1;i>pos+1;i--){
       array_[i]=array_[i-1];
     }
-    array_[pos].first = key;
-    array_[pos].second = value;
+    array_[pos+1].first = key;
+    array_[pos+1].second = value;
 
     if(GetSize()>GetMaxSize()){/*out of maxsize*/
       BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
@@ -99,7 +113,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
         IncreaseSize(-1);
       }
       //parent+1: parent will judge wheather it need to split
-      parent->insert_key(next_page->KeyAt(0), nid, comparator, tree);
+      parent->insert_key(KeyAt(0), GetPageId(), next_page->KeyAt(0), nid, comparator, tree);
           
     }
     return;    
