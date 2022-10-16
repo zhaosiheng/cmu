@@ -59,6 +59,26 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     return ValueAt(GetSize() - 1);
   }
   ValueType get_sibling(const KeyType &key, const KeyComparator &comparator){
+    int cur = GetSize() - 1;//cur_pos
+    /*array_[0]_is_invalid*/
+    for(int i=1;i<GetSize();i++){
+      int rs = comparator(KeyAt(i), key);
+      if(rs == 1){
+        cur = i - 1;
+      }else if(rs == 0){
+        cur = i;
+      }else if(rs == -1){
+        continue;
+      }
+    }
+    if(pos == 0){
+
+    }else if(pos == GetSize() - 1){
+
+    }else{
+
+    }
+
 
   }
   template<typename mValueType>
