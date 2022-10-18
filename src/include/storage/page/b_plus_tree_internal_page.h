@@ -159,9 +159,28 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     for(int i=GetSize()-1;i>=pos+1;i--){
       array_[i-1] = array_[i];
     }
-
+    IncreaseSize(-1);
     if(GetSize()<GetMinSize()){
-      
+      if(GetParentPageId() == INVALID_PAGE_ID) return;
+      typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
+      parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
+      if(parent->GetSize() == 1) return;
+      page_id_t bro_id = parent->get_sibling(KeyAt(0), comparator);
+      typename BPlusTree<KeyType, ValueType, KeyComparator>::BPlusTreeLeafPage *bro;
+      bro = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::BPlusTreeLeafPage*>(tree->pid_to_page(bro_id));
+      //merge:cur->->->bro
+      if(bro->GetSize() + GetSize() <= GetMaxSize()){
+        int size = GetSize();
+        for(int i=0;i<size;i++){
+          IncreaseSize(-1);
+          bro->insert(KeyAt(i), ValueAt(i), comparator, tree);
+        }
+        parent->remove(GetPageId(), tree);
+      }else{//lend one kv
+        int pos = bro->GetSize()-1;
+        insert(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);
+        bro->IncreaseSize(-1);
+      }
     }
   }
  private:
