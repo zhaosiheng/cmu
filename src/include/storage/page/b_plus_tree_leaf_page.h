@@ -50,6 +50,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   auto GetNextPageId() const -> page_id_t;
   void SetNextPageId(page_id_t next_page_id);
   auto KeyAt(int index) const -> KeyType;
+  auto ValueAt(int index) const -> ValueType;
   //mine
   bool lookup(const KeyType &key,ValueType &value, const KeyComparator &comparator){
     for(int i=0;i<GetSize();i++){
@@ -62,6 +63,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     return false;
   }
   bool insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree);
+  template<typename mValueType>
   void remove(const KeyType &key, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree){
     int pos = -1;
     for(int i=0;i<GetSize();i++){
@@ -77,8 +79,26 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     for(int i=pos;i<GetSize();i++){
       array_[i] = array_[i+1];
     }
-
+    //need lend
     if(GetSize()<GetMinSize()){
+      typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
+      parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
+      page_id_t bro_id = parent->get_sibling(KeyAt(0), comparator);
+      typename BPlusTree<KeyType, ValueType, KeyComparator>::BPlusTreeLeafPage *bro;
+      bro = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::BPlusTreeLeafPage*>(tree->pid_to_page(bro_id));
+      //merge:cur->->->bro
+      if(bro->GetSize() + GetSize() <= GetMaxSize()){
+        int size = GetSize();
+        for(int i=0;i<size;i++){
+          IncreaseSize(-1);
+          bro->insert(KeyAt(i), ValueAt(i), comparator, tree);
+        }
+        parent->remove(GetPageId(), tree);
+      }else{//lend one kv
+        int pos = bro->GetSize()-1;
+        insert(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);
+        bro->IncreaseSize(-1);
+      }
       
     }
   }

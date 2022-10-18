@@ -71,16 +71,26 @@ class BPlusTreeInternalPage : public BPlusTreePage {
         continue;
       }
     }
-    if(pos == 0){
-
-    }else if(pos == GetSize() - 1){
-
+    int tar;
+    if(cur == 0){
+      tar = cur + 1;
+    }else if(cur == GetSize() - 1){
+      tar = cur - 1;
     }else{
-
+      tar = cur + 1;
     }
-
-
+    return ValueAt(tar);
   }
+  void update_value(const KeyType &src, const ValueType &tar, const KeyComparator &comparator){
+    for(int i=0;i<GetSize();i++){
+      int rs = comparator(KeyAt(i), src);
+      if(rs == 0){
+        array_[i] = tar;
+        return;
+      }
+    }
+  }
+
   template<typename mValueType>
   void insert_key(const KeyType &l_key, const ValueType &l_value, const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
     if(GetSize()==0){
@@ -137,6 +147,22 @@ class BPlusTreeInternalPage : public BPlusTreePage {
           
     }
     return;    
+  }
+  template<typename mValueType>
+  void remove(const ValueType &val, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
+    int pos = 0;
+    for(int i=0;i<GetSize();i++){
+      if(ValueAt(i) == val){
+        pos = i;
+      }
+    }
+    for(int i=GetSize()-1;i>=pos+1;i--){
+      array_[i-1] = array_[i];
+    }
+
+    if(GetSize()<GetMinSize()){
+      
+    }
   }
  private:
   // Flexible array member for page data.

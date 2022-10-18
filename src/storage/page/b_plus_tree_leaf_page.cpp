@@ -58,6 +58,13 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::KeyAt(int index) const -> KeyType {
   KeyType key{};
   return key;
 }
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_LEAF_PAGE_TYPE::ValueAt(int index) const -> ValueType {
+  if(index < GetSize()){
+    return array_[index].second;
+  }
+  return 0;
+}
 
 /*if key already exist, return false*/
 INDEX_TEMPLATE_ARGUMENTS
@@ -76,6 +83,13 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
   IncreaseSize(1);
   for(int i=GetSize()-1;i>pos;i--){
     array_[i]=array_[i-1];
+  }
+  /*update_parent's_k*/
+  if(pos == 0 && GetSize()<=GetMaxSize() && GetParentPageId()!=INVALID_PAGE_ID){
+    BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
+    typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
+    parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(page);
+    parent->update_value(KeyAt(0), key);
   }
   array_[pos].first = key;
   array_[pos].second = value;
