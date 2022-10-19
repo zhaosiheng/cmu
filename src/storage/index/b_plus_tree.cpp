@@ -181,10 +181,8 @@ void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
   }
   /*->leaf*/
   auto cur_page = reinterpret_cast<LeafPage*>(t_page);
-  ValueType v;
-  cur_page->k_to_v(key, v, comparator_);
   /*remove from leaf*/
-  return cur_page->remove(v, comparator_, this);  
+  return cur_page->remove(key, comparator_, this);  
 }
 
 /*****************************************************************************

@@ -58,17 +58,12 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     }
     return ValueAt(GetSize() - 1);
   }
-  ValueType get_sibling(const KeyType &key, const KeyComparator &comparator){
+  ValueType get_sibling(const ValueType &value){
     int cur = GetSize() - 1;//cur_pos
     /*array_[0]_is_invalid*/
     for(int i=1;i<GetSize();i++){
-      int rs = comparator(KeyAt(i), key);
-      if(rs == 1){
-        cur = i - 1;
-      }else if(rs == 0){
+      if(ValueAt(i) == value){
         cur = i;
-      }else if(rs == -1){
-        continue;
       }
     }
     int tar;
@@ -172,7 +167,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
       parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
       if(parent->GetSize() == 1) return;
-      page_id_t bro_id = parent->get_sibling(KeyAt(0), comparator);
+      page_id_t bro_id = parent->get_sibling(GetPageId());
       typename BPlusTree<KeyType, ValueType, KeyComparator>::BPlusTreeLeafPage *bro;
       bro = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::BPlusTreeLeafPage*>(tree->pid_to_page(bro_id));
       //merge:cur->->->bro
