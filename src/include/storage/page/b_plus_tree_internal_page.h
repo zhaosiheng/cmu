@@ -168,8 +168,8 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
       if(parent->GetSize() == 1) return;
       page_id_t bro_id = parent->get_sibling(GetPageId());
-      typename BPlusTree<KeyType, ValueType, KeyComparator>::BPlusTreeLeafPage *bro;
-      bro = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::BPlusTreeLeafPage*>(tree->pid_to_page(bro_id));
+      typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *bro;
+      bro = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(bro_id));
       //merge:cur->->->bro
       if(bro->GetSize() + GetSize() <= GetMaxSize()){
         int size = GetSize();
