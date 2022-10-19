@@ -90,10 +90,15 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       }
     }
   }
-
+  /*insert in order. will appear in for{}*/
+  void batch_insert(const KeyType &key, const ValueType &value){
+    array_[GetSize()].first = key;
+    array_[GetSize()].second = value;
+    IncreaseSize(1);
+  }
   template<typename mValueType>
-  void insert_key(const KeyType &l_key, const ValueType &l_value, const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
-    if(GetSize()==0){
+  void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree, const KeyType &l_key = {}, const ValueType &l_value = 0){
+    if(GetSize()==0 && l_value!=0){
       IncreaseSize(2);
       array_[GetSize()-1].first = key;
       array_[GetSize()-1].second = value;
@@ -138,12 +143,14 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       page_id_t nid;
       auto next_page = tree->new_internal_page(nid, GetParentPageId());
       //redistribute
+      int start = GetSize() - 1 - GetMinSize();
       for(int i=0;i<GetMinSize();i++){
-        next_page->insert_key(array_[GetSize()-1].first, array_[GetSize()-1].second, comparator, tree);
+        next_page->batch_insert(array_[start].first, array_[start].second);
+        start++;
         IncreaseSize(-1);
       }
       //parent+1: parent will judge wheather it need to split
-      parent->insert_key(KeyAt(0), GetPageId(), next_page->KeyAt(0), nid, comparator, tree);
+      parent->insert_key(next_page->KeyAt(0), nid, comparator, tree, KeyAt(0), GetPageId());
           
     }
     return;    
@@ -173,12 +180,12 @@ class BPlusTreeInternalPage : public BPlusTreePage {
         int size = GetSize();
         for(int i=0;i<size;i++){
           IncreaseSize(-1);
-          bro->insert(KeyAt(i), ValueAt(i), comparator, tree);
+          bro->insert_key(KeyAt(i), ValueAt(i), comparator, tree);
         }
         parent->remove(GetPageId(), tree);
       }else{//lend one kv
         int pos = bro->GetSize()-1;
-        insert(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);
+        insert_key(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);
         bro->IncreaseSize(-1);
       }
     }

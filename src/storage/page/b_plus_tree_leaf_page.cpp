@@ -111,12 +111,14 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
     auto next_page = tree->new_leaf_page(nid, GetNextPageId(), GetParentPageId());
     SetNextPageId(nid);
     //redistribute
+    int start = GetSize() - 1 - GetMinSize();
     for(int i=0;i<GetMinSize();i++){
-      next_page->insert(array_[GetSize()-1].first, array_[GetSize()-1].second, comparator, tree);
+      next_page->batch_insert(array_[start].first, array_[start].second);
+      start++;
       IncreaseSize(-1);
     }
     //parent+1: parent will judge wheather it need to split
-    parent->insert_key(KeyAt(0), GetPageId(), next_page->KeyAt(0), nid, comparator, tree);
+    parent->insert_key(next_page->KeyAt(0), nid, comparator, tree, KeyAt(0), GetPageId());
   }
   return true;
 }

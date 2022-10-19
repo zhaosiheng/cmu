@@ -62,7 +62,7 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
   }
   auto cur_page = reinterpret_cast<LeafPage*>(t_page);
   ValueType v;
-  if(cur_page->lookup(key, v, comparator_)){
+  if(cur_page->k_to_v(key, v, comparator_)){
     result->push_back(v);
     return true;
   }
@@ -167,7 +167,6 @@ INDEX_TEMPLATE_ARGUMENTS
 void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
   if(IsEmpty()) return;
   Page *page = buffer_pool_manager_->FetchPage(root_page_id_);
-  assert(page != nullptr);
   /*internal->...->internal->*/
   BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
   buffer_pool_manager_->UnpinPage(root_page_id_, false);
@@ -182,8 +181,10 @@ void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
   }
   /*->leaf*/
   auto cur_page = reinterpret_cast<LeafPage*>(t_page);
-  /*insert into leaf*/
-  return cur_page->remove(key, comparator_, this);  
+  ValueType v;
+  cur_page->k_to_v(key, v, comparator_);
+  /*remove from leaf*/
+  return cur_page->remove(v, comparator_, this);  
 }
 
 /*****************************************************************************

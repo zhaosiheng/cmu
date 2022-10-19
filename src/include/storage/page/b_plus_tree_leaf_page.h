@@ -52,7 +52,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   auto KeyAt(int index) const -> KeyType;
   auto ValueAt(int index) const -> ValueType;
   //mine
-  bool lookup(const KeyType &key,ValueType &value, const KeyComparator &comparator){
+  bool k_to_v(const KeyType &key,ValueType &value, const KeyComparator &comparator){
     for(int i=0;i<GetSize();i++){
       int rs = comparator(KeyAt(i), key);
       if(rs == 0){
@@ -63,6 +63,12 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     return false;
   }
   bool insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree);
+  /*insert in order. will appear in for{}*/
+  void batch_insert(const KeyType &key, const ValueType &value){
+    array_[GetSize()].first = key;
+    array_[GetSize()].second = value;
+    IncreaseSize(1);
+  }
   template<typename mValueType>
   void remove(const KeyType &key, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree){
     int pos = -1;
