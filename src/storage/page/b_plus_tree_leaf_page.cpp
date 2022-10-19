@@ -63,7 +63,8 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::ValueAt(int index) const -> ValueType {
   if(index < GetSize()){
     return array_[index].second;
   }
-  return 0;
+  ValueType value{};
+  return value;
 }
 
 /*if key already exist, return false*/
@@ -89,7 +90,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
     BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
     typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
     parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(page);
-    parent->update_value(KeyAt(0), key);
+    parent->update_value(KeyAt(0), key, comparator);
   }
   array_[pos].first = key;
   array_[pos].second = value;

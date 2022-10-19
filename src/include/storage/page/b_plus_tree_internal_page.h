@@ -80,7 +80,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     for(int i=0;i<GetSize();i++){
       int rs = comparator(KeyAt(i), src);
       if(rs == 0){
-        array_[i].second = tar;
+        array_[i].first = tar;
         return;
       }
     }
