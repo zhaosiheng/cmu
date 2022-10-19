@@ -76,10 +76,9 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     }
     return ValueAt(tar);
   }
-  void update_value(const KeyType &src, const ValueType &tar, const KeyComparator &comparator){
+  void update_key(const KeyType &tar, const ValueType &val){
     for(int i=0;i<GetSize();i++){
-      int rs = comparator(KeyAt(i), src);
-      if(rs == 0){
+      if(ValueAt(i) == val){
         array_[i].first = tar;
         return;
       }
