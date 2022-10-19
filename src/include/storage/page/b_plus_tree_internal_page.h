@@ -151,7 +151,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     return;    
   }
   template<typename mValueType>
-  void remove(const ValueType &val, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
+  void remove(const ValueType &val, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
     int pos = 0;
     for(int i=0;i<GetSize();i++){
       if(ValueAt(i) == val){
@@ -177,7 +177,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
           IncreaseSize(-1);
           bro->insert_key(KeyAt(i), ValueAt(i), comparator, tree);
         }
-        parent->remove(GetPageId(), tree);
+        parent->remove(GetPageId(), comparator, tree);
       }else{//lend one kv
         int pos = bro->GetSize()-1;
         insert_key(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);

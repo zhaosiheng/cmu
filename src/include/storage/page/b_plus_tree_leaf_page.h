@@ -101,7 +101,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
           IncreaseSize(-1);
           bro->insert(KeyAt(i), ValueAt(i), comparator, tree);
         }
-        parent->remove(GetPageId(), tree);
+        parent->remove(GetPageId(), comparator, tree);
       }else{//lend one kv
         int pos = bro->GetSize()-1;
         insert(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);
