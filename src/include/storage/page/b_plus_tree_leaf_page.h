@@ -69,7 +69,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     array_[GetSize()].second = value;
     IncreaseSize(1);
   }
-  template<typename mValueType>
+  
   void remove(const KeyType &key, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree){
     int pos = -1;
     for(int i=0;i<GetSize();i++){
