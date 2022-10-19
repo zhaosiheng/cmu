@@ -88,8 +88,8 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     //need lend
     if(GetSize()<GetMinSize()){
       if(GetParentPageId() == INVALID_PAGE_ID) return;
-      typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
-      parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
+      typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
+      parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
       if(parent->GetSize() == 1) return;
       page_id_t bro_id = parent->get_sibling(GetPageId());
       typename BPlusTree<KeyType, ValueType, KeyComparator>::BPlusTreeLeafPage *bro;
