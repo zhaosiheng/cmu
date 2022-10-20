@@ -18,6 +18,9 @@ LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : replacer_size_(num_fra
     lst = new my_list(num_frames,k);
 }
 
+LRUKReplacer::~LRUKReplacer(){
+    delete lst;
+}
 auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
     std::scoped_lock sl(latch_);
     return lst->evcit(frame_id);
