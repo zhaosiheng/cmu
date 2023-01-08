@@ -71,8 +71,8 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::ValueAt(int index) const -> ValueType {
 INDEX_TEMPLATE_ARGUMENTS
 bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree){
   int pos = 0;//where need to insert
-  for(;pos<GetSize();ipos++){
-    int rs = comparator(KeyAt(i), key);
+  for(;pos<GetSize();pos++){
+    int rs = comparator(KeyAt(pos), key);
     if(rs == 0){
       return false;
     }else if(rs == 1){
