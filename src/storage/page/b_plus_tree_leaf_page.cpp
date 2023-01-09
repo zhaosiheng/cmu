@@ -95,7 +95,8 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
   }
   array_[pos].first = key;
   array_[pos].second = value;
-
+  LOG_INFO("# add a kv in leaf");
+  
   if(GetSize() > GetMaxSize()){/*out of maxsize*/
     BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
     typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;

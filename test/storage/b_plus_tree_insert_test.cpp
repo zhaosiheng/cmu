@@ -58,7 +58,7 @@ TEST(BPlusTreeTests, InsertTest1) {
 
   bpm->UnpinPage(root_page_id, false);
   bpm->UnpinPage(HEADER_PAGE_ID, true);
-  LOG_INFO("# here is it");
+  
   delete transaction;
   delete disk_manager;
   delete bpm;
