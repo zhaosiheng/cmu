@@ -16,6 +16,8 @@
 #include "storage/page/b_plus_tree_leaf_page.h"
 #include "storage/index/b_plus_tree.h"
 #include "storage/page/b_plus_tree_internal_page.h"
+
+#include "common/logger.h"
 namespace bustub {
 
 /*****************************************************************************
@@ -104,6 +106,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
       parent = tree->new_internal_page(tmp);
       tree->update_root(tmp);
       SetParentPageId(tmp);
+      LOG_INFO("# add internal page");
     }
     /*new_leaf, redistribute, parent+1*/
     //new_leaf
