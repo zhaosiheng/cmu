@@ -18,6 +18,7 @@
 #include "storage/index/b_plus_tree.h"
 #include "test_util.h"  // NOLINT
 
+#include "common/logger.h"
 namespace bustub {
 
 TEST(BPlusTreeTests, InsertTest1) {
@@ -57,6 +58,7 @@ TEST(BPlusTreeTests, InsertTest1) {
 
   bpm->UnpinPage(root_page_id, false);
   bpm->UnpinPage(HEADER_PAGE_ID, true);
+  LOG_INFO("# here is it");
   delete transaction;
   delete disk_manager;
   delete bpm;
