@@ -138,7 +138,7 @@ typename BPLUSTREE_TYPE::InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id
 //new_leaf id=SelfId, set its NextPageId, set its ParentId
 INDEX_TEMPLATE_ARGUMENTS
 typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &SelfId, page_id_t NextPageId, page_id_t ParentId){
-  Page *page = buffer_pool_manager_->NewPage(SelfId);
+  Page *page = buffer_pool_manager_->NewPage(&SelfId);
   assert(page != nullptr);
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::LeafPage*>(page->GetData());
   cur_page->Init(SelfId, ParentId, leaf_max_size_);
