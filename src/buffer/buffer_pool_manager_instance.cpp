@@ -69,6 +69,7 @@ auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * {
 }
 
 auto BufferPoolManagerInstance::FetchPgImp(page_id_t pid) -> Page * {
+  if(pid == INVALID_PAGE_ID) return nullptr;
   std::scoped_lock lock{latch_};
   frame_id_t fid;
   if(page_table_->Find(pid , fid)){
