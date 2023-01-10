@@ -94,8 +94,7 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
     cur_page->Init(pid, INVALID_PAGE_ID, leaf_max_size_);
     
     //update_root
-    root_page_id_ = pid;
-    UpdateRootPageId(true);
+    Update_root(pid);
   }else{
     page = buffer_pool_manager_->FetchPage(root_page_id_);
     assert(page != nullptr);  

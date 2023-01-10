@@ -109,7 +109,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
       page_id_t tmp;
       parent = tree->new_internal_page(tmp);
       LOG_DEBUG("# new internal=%d", parent->GetPageId());
-      tree->update_root(tmp);
+      tree->Update_root(tmp);
       SetParentPageId(tmp);
       LOG_DEBUG("# add an internal page=%d in tree", GetParentPageId());
       parent->_insert_key(KeyAt(0), GetPageId(), comparator, tree);

@@ -79,8 +79,9 @@ public:
   BPlusTreePage* pid_to_page(page_id_t pid);
   InternalPage* new_internal_page(page_id_t &nid, page_id_t parent = INVALID_PAGE_ID);
   LeafPage* new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent = INVALID_PAGE_ID);
-  void update_root(int insert_record = 0){
-    UpdateRootPageId(insert_record);
+  void Update_root(page_id_t pid){
+    root_page_id_ = pid;
+    UpdateRootPageId(true);
   }
  private:
   void UpdateRootPageId(int insert_record = 0);
