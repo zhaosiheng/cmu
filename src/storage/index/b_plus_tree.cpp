@@ -99,6 +99,7 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   }else{
     page = buffer_pool_manager_->FetchPage(root_page_id_);
     assert(page != nullptr);  
+    LOG_DEBUG("# root=%d", root_page_id_);
   }
   /*internal->...->internal->*/
   BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
