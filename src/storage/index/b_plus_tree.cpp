@@ -115,7 +115,7 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   return cur_page->insert(key, value, comparator_, this);
 }
 
-/*callback function*/
+/*my function*/
 INDEX_TEMPLATE_ARGUMENTS
 BPlusTreePage* BPLUSTREE_TYPE::pid_to_page(page_id_t pid){
   Page *page = buffer_pool_manager_->FetchPage(pid);
@@ -124,7 +124,7 @@ BPlusTreePage* BPLUSTREE_TYPE::pid_to_page(page_id_t pid){
   buffer_pool_manager_->UnpinPage(pid, false);
   return rs;
 }
-/*callback function*/
+/*my function*/
 INDEX_TEMPLATE_ARGUMENTS
 typename BPLUSTREE_TYPE::InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id_t &nid, page_id_t parent){
   Page *page = buffer_pool_manager_->NewPage(&nid);
@@ -134,7 +134,7 @@ typename BPLUSTREE_TYPE::InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id
   buffer_pool_manager_->UnpinPage(nid, false);
   return cur_page;
 }
-/*callback function*/
+/*my function*/
 INDEX_TEMPLATE_ARGUMENTS
 typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &nid, page_id_t nnid, page_id_t parent){
   page_id_t tmp;

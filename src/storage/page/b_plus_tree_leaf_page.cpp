@@ -98,16 +98,20 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
   LOG_DEBUG("# add a kv in leaf=%d", GetPageId());
   
   if(GetSize() > GetMaxSize()){/*out of maxsize*/
+    LOG_DEBUG("# need to split");
     BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
     typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
     if(page){/*has parent*/
+      LOG_DEBUG("# leaf=%d has parent=%d", GetParentPageId(), GetPageId());
       parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(page);
     }else{/*no parent*/
+      LOG_DEBUG("# leaf=%d has no parent", GetPageId());
       page_id_t tmp;
       parent = tree->new_internal_page(tmp);
+      LOG_DEBUG("# new internal=%d", parent->GetPageId());
       tree->update_root(tmp);
       SetParentPageId(tmp);
-      LOG_INFO("# add internal page");
+      LOG_DEBUG("# add an internal page=%d", GetParentPageId());
     }
     /*new_leaf, redistribute, parent+1*/
     //new_leaf
