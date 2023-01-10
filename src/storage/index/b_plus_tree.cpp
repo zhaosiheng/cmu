@@ -6,6 +6,7 @@
 #include "storage/index/b_plus_tree.h"
 #include "storage/page/header_page.h"
 #include <map>
+#include "common/logger.h"
 namespace bustub {
 /*global_config_map*/
 INDEX_TEMPLATE_ARGUMENTS
@@ -48,6 +49,7 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
   buffer_pool_manager_->UnpinPage(root_page_id_, false);
   //unpin
   while(t_page->IsRootPage()){
+    LOG_DEBUG("# find a internal=%d", t_page->GetPageId());
     auto cur_page = reinterpret_cast<InternalPage*>(t_page);
     page_id_t next_page_id = cur_page->lookup(key, comparator_);
     if(!(page = buffer_pool_manager_->FetchPage(next_page_id))){
@@ -60,6 +62,7 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
   if(!t_page->IsLeafPage()){
     return false;
   }
+  LOG_DEBUG("# find a leaf=%d", t_page->GetPageId());
   auto cur_page = reinterpret_cast<LeafPage*>(t_page);
   ValueType v;
   if(cur_page->k_to_v(key, v, comparator_)){
@@ -101,6 +104,7 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
   buffer_pool_manager_->UnpinPage(root_page_id_, false);
   while(t_page->IsRootPage()){
+    LOG_DEBUG("# find a internal=%d", t_page->GetPageId());
     auto cur_page = reinterpret_cast<InternalPage*>(t_page);
     page_id_t next_page_id = cur_page->lookup(key, comparator_);
     if(!(page = buffer_pool_manager_->FetchPage(next_page_id))){
@@ -110,6 +114,7 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
     buffer_pool_manager_->UnpinPage(next_page_id, false);
   }
   /*->leaf*/
+  LOG_DEBUG("# find a leaf=%d", t_page->GetPageId());
   auto cur_page = reinterpret_cast<LeafPage*>(t_page);
   /*insert into leaf*/
   return cur_page->insert(key, value, comparator_, this);

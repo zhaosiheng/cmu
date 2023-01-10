@@ -54,8 +54,6 @@ class BPlusTreeInternalPage : public BPlusTreePage {
         return ValueAt(i-1);
       }else if(rs == 0){
         return ValueAt(i);
-      }else if(rs == -1){
-        continue;
       }
     }
     return ValueAt(GetSize() - 1);
