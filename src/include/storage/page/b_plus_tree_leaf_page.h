@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "storage/page/b_plus_tree_page.h"
-
+#include "common/logger.h"
 namespace bustub {
 template <typename KeyType, typename ValueType, typename KeyComparator>
 class BPlusTree;
