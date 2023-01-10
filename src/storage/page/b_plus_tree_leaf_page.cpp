@@ -112,6 +112,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
       tree->update_root(tmp);
       SetParentPageId(tmp);
       LOG_DEBUG("# add an internal page=%d in tree", GetParentPageId());
+      parent->_insert_key(KeyAt(0), GetPageId(), comparator, tree);
     }
     /*new_leaf, redistribute, parent+1*/
     //add a new_leaf between cur & next
@@ -129,7 +130,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
     }
     LOG_DEBUG("# finish redistribution");
     //parent+1: parent will judge wheather it need to split
-    parent->_insert_key(next_page->KeyAt(0), tmp, comparator, tree);//, KeyAt(0), GetPageId());
+    parent->_insert_key(next_page->KeyAt(0), GetNextPageId(), comparator, tree);//, KeyAt(0), GetPageId());
   }
   return true;
 }
