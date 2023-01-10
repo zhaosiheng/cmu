@@ -108,7 +108,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     }
     array_[pos].first = key;
     array_[pos].second = value;
-    LOG_DEBUG("# add a kv in internal=%d", GetPageId());
+    LOG_DEBUG("# add a kv in internal=%d, cur_num=%d", GetPageId(), GetSize());
 
   }
   template<typename mValueType>
