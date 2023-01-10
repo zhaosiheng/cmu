@@ -111,13 +111,14 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
       LOG_DEBUG("# new internal=%d", parent->GetPageId());
       tree->update_root(tmp);
       SetParentPageId(tmp);
-      LOG_DEBUG("# add an internal page=%d", GetParentPageId());
+      LOG_DEBUG("# add an internal page=%d in tree", GetParentPageId());
     }
     /*new_leaf, redistribute, parent+1*/
-    //new_leaf
-    page_id_t nid;
-    auto next_page = tree->new_leaf_page(nid, GetNextPageId(), GetParentPageId());
-    SetNextPageId(nid);
+    //add a new_leaf between cur & next
+    page_id_t tmp;
+    auto next_page = tree->new_leaf_page(tmp, GetNextPageId(), GetParentPageId());
+    LOG_DEBUG("# new leaf=%d", next_page->GetPageId());
+    SetNextPageId(tmp);
     //redistribute
     int start = GetSize() - 1 - GetMinSize();
     for(int i=0;i<GetMinSize();i++){
@@ -126,7 +127,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
       IncreaseSize(-1);
     }
     //parent+1: parent will judge wheather it need to split
-    parent->insert_key(next_page->KeyAt(0), nid, comparator, tree, KeyAt(0), GetPageId());
+    parent->insert_key(next_page->KeyAt(0), tmp, comparator, tree, KeyAt(0), GetPageId());
   }
   return true;
 }
