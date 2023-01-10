@@ -150,7 +150,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       }else{/*no parent*/
         page_id_t tmp;
         parent = tree->new_internal_page(tmp);
-        tree->update_root(tmp);
+        tree->Update_root(tmp);
         SetParentPageId(tmp);
       }
       /*new_internal, redistribute, parent+1*/
