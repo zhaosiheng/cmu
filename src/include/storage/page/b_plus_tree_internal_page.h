@@ -96,7 +96,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     for(;pos<GetSize();pos++){
       int rs = comparator(KeyAt(pos), key);
       if(rs == 0){
-        return false;
+        return;
       }else if(rs == 1){
         break;
       }
@@ -109,7 +109,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     array_[pos].first = key;
     array_[pos].second = value;
     LOG_DEBUG("# add a kv in internal=%d", GetPageId());
-            
+
   }
   template<typename mValueType>
   void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree, const KeyType &l_key = {}, const ValueType &l_value = 0){
