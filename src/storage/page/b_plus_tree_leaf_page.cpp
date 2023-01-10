@@ -102,7 +102,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
     BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
     typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
     if(page){/*has parent*/
-      LOG_DEBUG("# leaf=%d has parent=%d", GetParentPageId(), GetPageId());
+      LOG_DEBUG("# leaf=%d has parent=%d", GetPageId(), GetParentPageId());
       parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(page);
     }else{/*no parent*/
       LOG_DEBUG("# leaf=%d has no parent", GetPageId());
