@@ -95,7 +95,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
   }
   array_[pos].first = key;
   array_[pos].second = value;
-  LOG_DEBUG("# add a kv=%d in leaf", key);
+  LOG_DEBUG("# add a kv in leaf=%d", GetPageId());
   
   if(GetSize() > GetMaxSize()){/*out of maxsize*/
     BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
