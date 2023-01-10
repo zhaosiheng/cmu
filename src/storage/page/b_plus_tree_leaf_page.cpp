@@ -125,9 +125,11 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
       next_page->batch_insert(array_[start].first, array_[start].second);
       start++;
       IncreaseSize(-1);
+      LOG_DEBUG("# rm a kv from leaf=%d, cur_num=%d", GetPageId(), GetSize());
     }
+    LOG_DEBUG("# finish redistribution");
     //parent+1: parent will judge wheather it need to split
-    parent->insert_key(next_page->KeyAt(0), tmp, comparator, tree, KeyAt(0), GetPageId());
+    parent->_insert_key(next_page->KeyAt(0), tmp, comparator, tree);//, KeyAt(0), GetPageId());
   }
   return true;
 }

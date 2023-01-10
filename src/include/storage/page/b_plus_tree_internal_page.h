@@ -91,6 +91,27 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     IncreaseSize(1);
   }
   template<typename mValueType>
+  void _insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
+    int pos = 0;//where need to insert
+    for(;pos<GetSize();pos++){
+      int rs = comparator(KeyAt(pos), key);
+      if(rs == 0){
+        return false;
+      }else if(rs == 1){
+        break;
+      }
+    }
+  /*m_size+1*/
+    IncreaseSize(1);
+    for(int i=GetSize()-1;i>pos;i--){
+      array_[i]=array_[i-1];
+    }
+    array_[pos].first = key;
+    array_[pos].second = value;
+    LOG_DEBUG("# add a kv in internal=%d", GetPageId());
+            
+  }
+  template<typename mValueType>
   void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree, const KeyType &l_key = {}, const ValueType &l_value = 0){
     if(GetSize()==0 && l_value!=0){
       IncreaseSize(2);

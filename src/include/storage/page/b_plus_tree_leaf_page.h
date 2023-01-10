@@ -68,6 +68,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     array_[GetSize()].first = key;
     array_[GetSize()].second = value;
     IncreaseSize(1);
+    LOG_DEBUG("# add a kv in leaf=%d, cur_num=%d", GetPageId(), GetSize());
   }
   
   void remove(const KeyType &key, const KeyComparator &comparator, BPlusTree<KeyType, ValueType, KeyComparator>* tree){
