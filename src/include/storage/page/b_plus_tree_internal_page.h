@@ -89,6 +89,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     array_[GetSize()].first = key;
     array_[GetSize()].second = value;
     IncreaseSize(1);
+    LOG_DEBUG("# add a kv in internal=%d, cur_num=%d", GetPageId(), GetSize());
   }
   template<typename mValueType>
   void _insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
@@ -110,6 +111,37 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     array_[pos].second = value;
     LOG_DEBUG("# add a kv in internal=%d, cur_num=%d", GetPageId(), GetSize());
 
+    if(GetSize()>GetMaxSize()){/*out of maxsize*/
+      BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
+      typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
+      if(page){/*has parent*/
+        LOG_DEBUG("# internal=%d has parent=%d", GetPageId(), GetParentPageId());
+        parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(page);
+      }else{/*no parent*/
+        LOG_DEBUG("# internal=%d has no parent", GetPageId());
+        page_id_t tmp;
+        parent = tree->new_internal_page(tmp);
+        LOG_DEBUG("# new internal=%d", parent->GetPageId());
+        tree->Update_root(tmp);
+        SetParentPageId(tmp);
+        parent->_insert_key(KeyAt(0), GetPageId(), comparator, tree);
+      }
+      /*new_internal, redistribute, parent+1*/
+      //new_internal
+      page_id_t nid;
+      auto next_page = tree->new_internal_page(nid, GetParentPageId());
+      LOG_DEBUG("# new internal=%d", next_page->GetPageId());
+      //redistribute
+      int start = GetSize() - 1 - GetMinSize();
+      for(int i=0;i<GetMinSize();i++){
+        next_page->batch_insert(array_[start].first, array_[start].second);
+        start++;
+        IncreaseSize(-1);
+        LOG_DEBUG("# rm a kv from internal=%d, cur_num=%d", GetPageId(), GetSize());
+      }
+      //parent+1: parent will judge wheather it need to split
+      parent->_insert_key(next_page->KeyAt(0), GetNextPageId(), comparator, tree);
+    }
   }
   template<typename mValueType>
   void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree, const KeyType &l_key = {}, const ValueType &l_value = 0){
