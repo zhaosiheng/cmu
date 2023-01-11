@@ -97,7 +97,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
   array_[pos].second = value;
   LOG_DEBUG("# add a kv in leaf=%d", GetPageId());
   
-  if(GetSize() > GetMaxSize()){/*out of maxsize*/
+  if(GetSize() >= GetMaxSize()){/*reach maxsize*/
     LOG_DEBUG("# need to split");
     BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
     typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
@@ -121,7 +121,7 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
     LOG_DEBUG("# new leaf=%d", next_page->GetPageId());
     SetNextPageId(tmp);
     //redistribute
-    int start = GetSize() - 1 - GetMinSize();
+    int start = GetSize() - GetMinSize();
     for(int i=0;i<GetMinSize();i++){
       next_page->batch_insert(array_[start].first, array_[start].second);
       start++;

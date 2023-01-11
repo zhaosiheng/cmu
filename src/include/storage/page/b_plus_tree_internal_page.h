@@ -111,7 +111,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     array_[pos].second = value;
     LOG_DEBUG("# add a kv in internal=%d, cur_num=%d", GetPageId(), GetSize());
 
-    if(GetSize()>GetMaxSize()){/*out of maxsize*/
+    if(GetSize() > GetMaxSize()){/*out of maxsize*/
       BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
       typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
       if(page){/*has parent*/
@@ -132,13 +132,14 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       auto next_page = tree->new_internal_page(nid, GetParentPageId());
       LOG_DEBUG("# new internal=%d", next_page->GetPageId());
       //redistribute
-      int start = GetSize() - 1 - GetMinSize();
+      int start = GetSize() - GetMinSize();
       for(int i=0;i<GetMinSize();i++){
         next_page->batch_insert(array_[start].first, array_[start].second);
         start++;
         IncreaseSize(-1);
         LOG_DEBUG("# rm a kv from internal=%d, cur_num=%d", GetPageId(), GetSize());
       }
+      LOG_DEBUG("# finish redistribution");
       //parent+1: parent will judge wheather it need to split
       parent->_insert_key(next_page->KeyAt(0), next_page->GetPageId(), comparator, tree);
     }
