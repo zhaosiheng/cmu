@@ -112,6 +112,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     LOG_DEBUG("# add a kv in internal=%d, cur_num=%d", GetPageId(), GetSize());
 
     if(GetSize() > GetMaxSize()){/*out of maxsize*/
+      LOG_DEBUG("# internal=%d need to split", GetPageId());
       BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
       typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
       if(page){/*has parent*/
@@ -124,6 +125,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
         LOG_DEBUG("# new internal=%d", parent->GetPageId());
         tree->Update_root(tmp);
         SetParentPageId(tmp);
+        LOG_DEBUG("# add an internal page=%d as leaf=%d's parent", GetParentPageId(), GetPageId());
         parent->_insert_key(KeyAt(0), GetPageId(), comparator, tree);
       }
       /*new_internal, redistribute, parent+1*/
