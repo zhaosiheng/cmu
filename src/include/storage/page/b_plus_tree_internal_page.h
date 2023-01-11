@@ -140,7 +140,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
         LOG_DEBUG("# rm a kv from internal=%d, cur_num=%d", GetPageId(), GetSize());
       }
       //parent+1: parent will judge wheather it need to split
-      parent->_insert_key(next_page->KeyAt(0), GetNextPageId(), comparator, tree);
+      parent->_insert_key(next_page->KeyAt(0), next_page->GetPageId(), comparator, tree);
     }
   }
   template<typename mValueType>
