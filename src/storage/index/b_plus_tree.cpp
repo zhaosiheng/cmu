@@ -56,6 +56,8 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
       return false;
     }
     t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
+    //update the parent node of child
+    t_page->SetParentPageId(cur_page->GetPageId());
     buffer_pool_manager_->UnpinPage(next_page_id, false);
   }
   /*->leaf*/
@@ -111,6 +113,8 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
       return false;
     }
     t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
+    //update the parent node of child
+    t_page->SetParentPageId(cur_page->GetPageId());
     buffer_pool_manager_->UnpinPage(next_page_id, false);
   }
   /*->leaf*/

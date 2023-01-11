@@ -138,7 +138,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       for(int i=0;i<GetMinSize();i++){
         next_page->batch_insert(array_[start].first, array_[start].second);
         start++;
-        //change leaf'sparent
+        //need to update child's parent
         IncreaseSize(-1);
         LOG_DEBUG("# rm a kv from internal=%d, cur_num=%d", GetPageId(), GetSize());
       }
