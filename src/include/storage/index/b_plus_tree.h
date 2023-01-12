@@ -47,7 +47,7 @@ public:
   auto IsEmpty() const -> bool;
 
   // Insert a key-value pair into this B+ tree.
-  auto Insert(const KeyType &key, const ValueType &value, Transaction *transaction = nullptr) -> bool;
+  auto Insert(const KeyType &key, const ValueType &value, Transaction *transaction = nullptr, bool updated = false) -> bool;
 
   // Remove a key and its value from this B+ tree.
   void Remove(const KeyType &key, Transaction *transaction = nullptr);

@@ -87,7 +87,7 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
  * keys return false, otherwise return true.
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transaction *transaction, bool updated = false) -> bool {
+auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transaction *transaction, bool updated) -> bool {
   Page *page;
   page_id_t pid;
   if(IsEmpty()){
