@@ -69,7 +69,7 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType {
       return -1;
     }
     BPlusTreePage *child_page = reinterpret_cast<BPlusTreePage*>(child->GetData());
-    child_page->SetParentPageId(cur_page->GetPageId());
+    child_page->SetParentPageId(child_page->GetPageId());
     this->buffer_pool_manager_->UnpinPage(array_[index].second, false);
     return array_[index].second;
   }
