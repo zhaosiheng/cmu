@@ -87,7 +87,7 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
  * keys return false, otherwise return true.
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transaction *transaction) -> bool {
+auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transaction *transaction, bool updated = false) -> bool {
   Page *page;
   page_id_t pid;
   if(IsEmpty()){
@@ -125,7 +125,8 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   /*insert into leaf*/
   bool rs =  cur_page->insert(key, value, comparator_, this);
   //pledge update parent setting
-  GetValue(key, {}, transaction);
+  if(!updated)
+    Insert(key, value, transaction, true);
   return rs;
 }
 
