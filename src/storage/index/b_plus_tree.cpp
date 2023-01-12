@@ -111,9 +111,6 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
       return false;
     }
     t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
-  //update the parent node of child
-    t_page->SetParentPageId(cur_page->GetPageId());
-    LOG_DEBUG("# update child=%d 's parent=%d", t_page->GetPageId(), t_page->GetParentPageId());
     buffer_pool_manager_->UnpinPage(next_page_id, false);
   }
   /*->leaf*/
