@@ -40,7 +40,7 @@ INDEX_TEMPLATE_ARGUMENTS
 class BPlusTreeInternalPage : public BPlusTreePage {
  public:
   // must call initialize method after "create" a new node
-  void Init(page_id_t page_id, page_id_t parent_id = INVALID_PAGE_ID, int max_size = INTERNAL_PAGE_SIZE);
+  void Init(page_id_t page_id, page_id_t parent_id = INVALID_PAGE_ID, int max_size = INTERNAL_PAGE_SIZE, BufferPoolManager *manager = nullptr);
 
   auto KeyAt(int index) const -> KeyType;
   void SetKeyAt(int index, const KeyType &key);
@@ -242,6 +242,8 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     }
   }
  private:
+ //using to update child's parent
+  BufferPoolManager *buffer_pool_manager_;
   // Flexible array member for page data.
   MappingType array_[1];
 };

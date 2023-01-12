@@ -27,12 +27,12 @@ namespace bustub {
  * max page size
  */
 INDEX_TEMPLATE_ARGUMENTS
-void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, int max_size) {
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, int max_size, BufferPoolManager *manager) {
   SetParentPageId(parent_id);
   SetPageId(page_id);
   SetMaxSize(max_size);
   SetPageType(IndexPageType::INTERNAL_PAGE);
-
+  this->buffer_pool_manager_ = manager;
   SetSize(0);
 }
 
@@ -63,6 +63,14 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetKeyAt(int index, const KeyType &key) {
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType {
   if(index < GetSize()){
+    //update child page's parent
+    Page *child;
+    if(!(child = this->buffer_pool_manager_->FetchPage(array_[index].second))){
+      return -1;
+    }
+    BPlusTreePage *child_page = reinterpret_cast<BPlusTreePage*>(child->GetData());
+    child_page->SetParentPageId(cur_page->GetPageId());
+    this->buffer_pool_manager_->UnpinPage(array_[index].second, false);
     return array_[index].second;
   }
   return 0;

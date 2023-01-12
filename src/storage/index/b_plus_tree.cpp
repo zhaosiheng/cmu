@@ -56,9 +56,6 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
       return false;
     }
     t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
-    //update the parent node of child
-    t_page->SetParentPageId(cur_page->GetPageId());
-    LOG_DEBUG("# update child=%d 's parent=%d", t_page->GetPageId(), t_page->GetParentPageId());
     buffer_pool_manager_->UnpinPage(next_page_id, false);
   }
   /*->leaf*/
@@ -145,7 +142,7 @@ typename BPLUSTREE_TYPE::InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id
   Page *page = buffer_pool_manager_->NewPage(&nid);
   assert(page != nullptr);
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::InternalPage*>(page->GetData());
-  cur_page->Init(nid, parent, internal_max_size_);
+  cur_page->Init(nid, parent, internal_max_size_, buffer_pool_manager_);
   buffer_pool_manager_->UnpinPage(nid, false);
   return cur_page;
 }
