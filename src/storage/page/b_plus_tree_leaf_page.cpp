@@ -87,12 +87,14 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
     array_[i]=array_[i-1];
   }
   /*update_parent's_k*/
+  /*
   if(pos == 0 && GetSize()<=GetMaxSize() && GetParentPageId()!=INVALID_PAGE_ID){
     BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
     typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
     parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(page);
     parent->update_key(key, GetPageId());
   }
+  */
   array_[pos].first = key;
   array_[pos].second = value;
   LOG_DEBUG("# add a kv in leaf=%d", GetPageId());

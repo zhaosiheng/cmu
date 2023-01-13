@@ -172,6 +172,8 @@ typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &Self
  * delete entry from leaf page. Remember to deal with redistribute or merge if
  * necessary.
  */
+ /*leaf will merge with next/lend from next(if no next leaf in parent internal, use prev leaf)*/
+ /*internal is same but parent internal will be delete when its size==1*/
 INDEX_TEMPLATE_ARGUMENTS
 void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
   if(IsEmpty()) return;
