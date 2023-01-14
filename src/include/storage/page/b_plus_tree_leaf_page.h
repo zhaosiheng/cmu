@@ -83,15 +83,15 @@ class BPlusTreeLeafPage : public BPlusTreePage {
       return;
     /*remove*/  
     IncreaseSize(-1);
-    for(int i=pos;i<GetSize();i++){
+    for(int i=pos;i<GetSize() - 1;i++){
       array_[i] = array_[i+1];
     }
-    //need lend
+    //need lend or merge
     if(GetSize()<GetMinSize()){
       if(GetParentPageId() == INVALID_PAGE_ID) return;
       typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
       parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
-      if(parent->GetSize() == 1) return;
+      //if(parent->GetSize() == 1) return;
       page_id_t bro_id = parent->get_sibling(GetPageId());
       typename BPlusTree<KeyType, ValueType, KeyComparator>::LeafPage *bro;
       bro = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::LeafPage*>(tree->pid_to_page(bro_id));

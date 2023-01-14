@@ -58,23 +58,17 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     }
     return ValueAt(GetSize() - 1);
   }
+  /*x->x+1->...->n->n-1*/
   ValueType get_sibling(const ValueType &value){
-    int cur = GetSize() - 1;//cur_pos
+    int cur = GetSize() - 1;//size>=2
     /*array_[0]_is_invalid*/
     for(int i=1;i<GetSize();i++){
       if(ValueAt(i) == value){
         cur = i;
       }
     }
-    int tar;
-    if(cur == 0){
-      tar = cur + 1;
-    }else if(cur == GetSize() - 1){
-      tar = cur - 1;
-    }else{
-      tar = cur + 1;
-    }
-    return ValueAt(tar);
+    if(cur == GetSize() - 1) return ValueAt(GetSize() - 2);
+    else return ValueAt(cur + 1);
   }
   void update_key(const KeyType &tar, const ValueType &val){
     for(int i=0;i<GetSize();i++){
