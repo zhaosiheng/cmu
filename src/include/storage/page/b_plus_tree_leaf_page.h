@@ -95,7 +95,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
       page_id_t bro_id = parent->get_sibling(GetPageId());
       typename BPlusTree<KeyType, ValueType, KeyComparator>::LeafPage *bro;
       bro = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::LeafPage*>(tree->pid_to_page(bro_id));
-      //merge:cur->->->bro
+      //merge:cur->>>>bro
       if(bro->GetSize() + GetSize() <= GetMaxSize()){
         int size = GetSize();
         for(int i=0;i<size;i++){
