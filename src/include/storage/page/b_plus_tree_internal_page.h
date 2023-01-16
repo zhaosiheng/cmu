@@ -224,6 +224,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     for(int i=pos;i<GetSize() - 1;i++){
       array_[i] = array_[i+1];
     }
+    //need lend or merge
     if(GetSize() <= GetMinSize()){
       if(GetParentPageId() == INVALID_PAGE_ID) return;
       typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
