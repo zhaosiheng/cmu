@@ -105,6 +105,15 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     array_[pos].second = value;
     LOG_DEBUG("# add a kv in internal=%d, cur_num=%d", GetPageId(), GetSize());
 
+    /*update_parent's_k, happened in removing*/
+    if(pos == 0 && GetSize() == GetMinSize() + GetMaxSize() % 2){//internal minsize = maxsize/2 +maxsize%2
+      if(GetParentPageId() == INVALID_PAGE_ID) return true;
+      typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
+      parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
+      parent->update_key(KeyAt(0), GetPageId());
+      return true;
+    }
+
     if(GetSize() > GetMaxSize()){/*out of maxsize*/
       LOG_DEBUG("# internal=%d need to split", GetPageId());
       BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
