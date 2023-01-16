@@ -86,19 +86,18 @@ bool B_PLUS_TREE_LEAF_PAGE_TYPE::insert(const KeyType &key, const ValueType &val
   for(int i=GetSize()-1;i>pos;i--){
     array_[i]=array_[i-1];
   }
-  /*update_parent's_k*/
-  /*
-  if(pos == 0 && GetSize()<=GetMaxSize() && GetParentPageId()!=INVALID_PAGE_ID){
-    BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
-    typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
-    parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(page);
-    parent->update_key(key, GetPageId());
-  }
-  */
   array_[pos].first = key;
   array_[pos].second = value;
   LOG_DEBUG("# add a kv in leaf=%d", GetPageId());
   
+  /*update_parent's_k, happened in removing*/
+  if(pos == 0 && GetSize() == GetMinSize()){
+    if(GetParentPageId() == INVALID_PAGE_ID) return true;
+    typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
+    parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
+    parent->update_key(KeyAt(0), GetPageId());
+    return true;
+  }
   if(GetSize() >= GetMaxSize()){/*reach maxsize*/
     LOG_DEBUG("# leaf=%d need to split", GetPageId());
     BPlusTreePage* page = tree->pid_to_page(GetParentPageId());

@@ -202,17 +202,20 @@ class BPlusTreeInternalPage : public BPlusTreePage {
   }
   template<typename mValueType>
   void remove(const ValueType &val, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
-    int pos = 0;
+    int pos = -1;
     for(int i=0;i<GetSize();i++){
       if(ValueAt(i) == val){
         pos = i;
       }
     }
-    for(int i=GetSize()-1;i>=pos+1;i--){
-      array_[i-1] = array_[i];
-    }
+    if(pos == -1)/*not find*/
+      return;
+    /*remove*/  
     IncreaseSize(-1);
-    if(GetSize()<GetMinSize()){
+    for(int i=pos;i<GetSize() - 1;i++){
+      array_[i] = array_[i+1];
+    }
+    if(GetSize() <= GetMinSize()){
       if(GetParentPageId() == INVALID_PAGE_ID) return;
       typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
       parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
