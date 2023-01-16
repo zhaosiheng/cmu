@@ -86,6 +86,12 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     for(int i=pos;i<GetSize() - 1;i++){
       array_[i] = array_[i+1];
     }
+    if(pos == 0){//update internal kv
+      if(GetParentPageId() == INVALID_PAGE_ID) return;
+      typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
+      parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
+      parent->update_key(KeyAt(0), GetPageId());
+    }
     //need lend or merge
     if(GetSize()<GetMinSize()){
       if(GetParentPageId() == INVALID_PAGE_ID) return;
@@ -96,17 +102,18 @@ class BPlusTreeLeafPage : public BPlusTreePage {
       typename BPlusTree<KeyType, ValueType, KeyComparator>::LeafPage *bro;
       bro = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::LeafPage*>(tree->pid_to_page(bro_id));
       //merge:cur->>>>bro
-      if(bro->GetSize() + GetSize() <= GetMaxSize()){
+      if(bro->GetSize() + GetSize() < GetMaxSize()){
         int size = GetSize();
         for(int i=0;i<size;i++){
           IncreaseSize(-1);
           bro->insert(KeyAt(i), ValueAt(i), comparator, tree);
         }
         parent->remove(GetPageId(), comparator, tree);
-      }else{//lend one kv
-        int pos = bro->GetSize()-1;
+      }else{//lend:cur<<<-bro
+        int cmp = comparator(KeyAt(0), bro->KeyAt(0));// cur>bro == 1
+        int pos = cmp > 0 ? bro->GetSize() - 1 : 0;
         insert(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);
-        bro->IncreaseSize(-1);
+        bro->remove(bro->KeyAt(pos), comparator, tree);
       }
       
     }
