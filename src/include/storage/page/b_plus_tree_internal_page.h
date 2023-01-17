@@ -107,11 +107,11 @@ class BPlusTreeInternalPage : public BPlusTreePage {
 
     /*update_parent's_k, happened in removing*/
     if(pos == 0 && GetSize() == GetMinSize() + GetMaxSize() % 2){//internal minsize = maxsize/2 +maxsize%2
-      if(GetParentPageId() == INVALID_PAGE_ID) return true;
+      if(GetParentPageId() == INVALID_PAGE_ID) return;
       typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
       parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
       parent->update_key(KeyAt(0), GetPageId());
-      return true;
+      return;
     }
 
     if(GetSize() > GetMaxSize()){/*out of maxsize*/
