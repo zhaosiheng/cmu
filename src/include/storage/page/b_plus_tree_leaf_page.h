@@ -102,6 +102,8 @@ class BPlusTreeLeafPage : public BPlusTreePage {
           bro->IncreaseSize(-1);
           insert(bro->KeyAt(i), bro->ValueAt(i), comparator, tree);
         }
+        //if(GetNextPageId() == bro->GetPageId()) SetNextPageId(bro->GetNextPageId());
+        //tree->buffer_pool_manager_->DeletePage(bro->GetPageId());
         parent->remove(bro->GetPageId(), comparator, tree);
       }else{//lend:cur<<<-bro
         int cmp = comparator(KeyAt(0), bro->KeyAt(0));// cur>bro == 1
