@@ -106,7 +106,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     LOG_DEBUG("# add a kv in internal=%d, cur_num=%d", GetPageId(), GetSize());
 
     /*update_parent's_k, happened in removing*/
-    if(pos == 0 && GetSize() == GetMinSize() + GetMaxSize() % 2){//internal minsize = maxsize/2 +maxsize%2
+    if(pos == 0 && GetSize() == GetMinSize()){
       if(GetParentPageId() == INVALID_PAGE_ID) return;
       typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *parent;
       parent = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
@@ -150,65 +150,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       parent->_insert_key(next_page->KeyAt(0), next_page->GetPageId(), comparator, tree);
     }
   }
-  template<typename mValueType>
-  void insert_key(const KeyType &key, const ValueType &value, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree, const KeyType &l_key = {}, const ValueType &l_value = 0){
-    if(GetSize()==0 && l_value!=0){
-      IncreaseSize(2);
-      array_[GetSize()-1].first = key;
-      array_[GetSize()-1].second = value;
-
-      array_[0].first = l_key;
-      array_[0].second = l_value;     
-      return; 
-    }
-    int pos = 0 ;/*where need to insert*/
-    /*array_[0]_is_invalid*/
-    for(int i=1;i<GetSize();i++){
-      int rs = comparator(KeyAt(i), l_key);
-      if(rs == 0){
-        pos = i;
-        break;
-      }else if(rs == 1){
-        pos = i-1;
-        break;
-      }
-    }
-    /*m_size+1*/
-    IncreaseSize(1);
-    for(int i=GetSize()-1;i>pos+1;i--){
-      array_[i]=array_[i-1];
-    }
-    array_[pos+1].first = key;
-    array_[pos+1].second = value;
-
-    if(GetSize()>GetMaxSize()){/*out of maxsize*/
-      BPlusTreePage* page = tree->pid_to_page(GetParentPageId());
-      typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
-      if(page){/*has parent*/
-        parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(page);
-      }else{/*no parent*/
-        page_id_t tmp;
-        parent = tree->new_internal_page(tmp);
-        tree->Update_root(tmp);
-        SetParentPageId(tmp);
-      }
-      /*new_internal, redistribute, parent+1*/
-      //new_internal
-      page_id_t nid;
-      auto next_page = tree->new_internal_page(nid, GetParentPageId());
-      //redistribute
-      int start = GetSize() - 1 - GetMinSize();
-      for(int i=0;i<GetMinSize();i++){
-        next_page->batch_insert(array_[start].first, array_[start].second);
-        start++;
-        IncreaseSize(-1);
-      }
-      //parent+1: parent will judge wheather it need to split
-      parent->insert_key(next_page->KeyAt(0), nid, comparator, tree, KeyAt(0), GetPageId());
-          
-    }
-    return;    
-  }
+ 
   template<typename mValueType>
   void remove(const ValueType &val, const KeyComparator &comparator, BPlusTree<KeyType, mValueType, KeyComparator>* tree){
     int pos = -1;
@@ -226,25 +168,35 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     }
     //need lend or merge
     if(GetSize() <= GetMinSize()){
-      if(GetParentPageId() == INVALID_PAGE_ID) return;
+      if(GetParentPageId() == INVALID_PAGE_ID){
+        if(GetSize() == 1){//delete page
+          buffer_pool_manager_->DeletePage(GetPageId());
+          SetPageId(INVALID_PAGE_ID);
+          tree->Update_root(ValueAt(0));
+          return;
+        }else{//maintain cur stats
+          return;
+        }
+      }
       typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage *parent;
       parent = reinterpret_cast<typename BPlusTree<KeyType, mValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(GetParentPageId()));
       if(parent->GetSize() == 1) return;
       page_id_t bro_id = parent->get_sibling(GetPageId());
       typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage *bro;
       bro = reinterpret_cast<typename BPlusTree<KeyType, ValueType, KeyComparator>::InternalPage*>(tree->pid_to_page(bro_id));
-      //merge:cur->->->bro
+      //merge:cur<<<-bro
       if(bro->GetSize() + GetSize() <= GetMaxSize()){
-        int size = GetSize();
+        int size = bro->GetSize();
         for(int i=0;i<size;i++){
-          IncreaseSize(-1);
-          bro->insert_key(KeyAt(i), ValueAt(i), comparator, tree);
+          bro->IncreaseSize(-1);
+          _insert_key(bro->KeyAt(i), bro->ValueAt(i), comparator, tree);
         }
-        parent->remove(GetPageId(), comparator, tree);
-      }else{//lend one kv
-        int pos = bro->GetSize()-1;
-        insert_key(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);
-        bro->IncreaseSize(-1);
+        parent->remove(bro->GetPageId(), comparator, tree);
+      }else{//lend:cur<<<-bro
+        int cmp = comparator(KeyAt(0), bro->KeyAt(0));// cur>bro == 1
+        int pos = cmp > 0 ? bro->GetSize() - 1 : 0;
+        _insert(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);
+        bro->remove(bro->ValueAt(pos), comparator, tree);
       }
     }
   }
