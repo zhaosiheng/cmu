@@ -107,7 +107,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
         int cmp = comparator(KeyAt(0), bro->KeyAt(0));// cur>bro == 1
         int pos = cmp > 0 ? bro->GetSize() - 1 : 0;
         insert(bro->KeyAt(pos), bro->ValueAt(pos), comparator, tree);
-        bro->remove(bro->ValueAt(pos), comparator, tree);
+        bro->remove(bro->KeyAt(pos), comparator, tree);
       }
     }
   }
