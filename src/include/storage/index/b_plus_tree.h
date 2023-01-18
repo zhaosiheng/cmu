@@ -83,7 +83,7 @@ public:
     root_page_id_ = pid;
     UpdateRootPageId(true);
   }
-  void set_leaf_next(page_id_t CurPageId, page_id_t NextPageId)
+  void set_leaf_next(page_id_t CurPageId, page_id_t NextPageId);
  private:
   void UpdateRootPageId(int insert_record = 0);
 
