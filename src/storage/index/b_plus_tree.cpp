@@ -156,6 +156,18 @@ typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &Self
   
   return cur_page;
 }
+
+/*my function*/
+
+INDEX_TEMPLATE_ARGUMENTS
+void BPLUSTREE_TYPE::set_leaf_next(page_id_t &CurPageId, page_id_t NextPageId, page_id_t ParentId){
+  auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::LeafPage*>(pid_to_page(CurPageId));
+  auto next_page = reinterpret_cast<BPLUSTREE_TYPE::LeafPage*>(pid_to_page(NextPageId));
+  
+  cur_page->SetNextPageId(next_page->GetNextPageId());
+  
+  return cur_page;
+}
 /**/
 
 
