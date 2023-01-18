@@ -170,7 +170,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     }
     /*remove*/  
     IncreaseSize(-1);
-    for(int i=pos;i<GetSize() - 1;i++){
+    for(int i=pos;i<GetSize();i++){
       array_[i] = array_[i+1];
     }
     //need lend or merge
