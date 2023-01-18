@@ -162,7 +162,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
     if(pos == -1)/*not find*/
       return;
     BPlusTreePage* pos_page = tree->pid_to_page(ValueAt(pos));
-    if(page->IsLeafPage()){
+    if(pos_page->IsLeafPage()){
       int prev = pos - 1;
 
       if(prev >= 0) tree->set_leaf_next(ValueAt(prev), ValueAt(pos));
