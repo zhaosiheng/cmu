@@ -166,7 +166,7 @@ void BPLUSTREE_TYPE::set_leaf_next(page_id_t &CurPageId, page_id_t NextPageId, p
   
   cur_page->SetNextPageId(next_page->GetNextPageId());
   
-  return cur_page;
+  return;
 }
 /**/
 
