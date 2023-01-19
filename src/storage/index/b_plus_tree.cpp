@@ -150,7 +150,7 @@ typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &Self
   Page *page = buffer_pool_manager_->NewPage(&SelfId);
   assert(page != nullptr);
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::LeafPage*>(page->GetData());
-  cur_page->Init(SelfId, ParentId, leaf_max_size_);
+  cur_page->Init(SelfId, ParentId, leaf_max_size_, buffer_pool_manager_);
   cur_page->SetNextPageId(NextPageId);
   buffer_pool_manager_->UnpinPage(SelfId, true);
   

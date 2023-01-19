@@ -105,7 +105,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
         //if(GetNextPageId() == bro->GetPageId()) SetNextPageId(bro->GetNextPageId());
         
         parent->remove(bro->GetPageId(), comparator, tree);
-        tree->buffer_pool_manager_->DeletePage(bro->GetPageId());
+        buffer_pool_manager_->DeletePage(bro->GetPageId());
       }else{//lend:cur<<<-bro
         int cmp = comparator(KeyAt(0), bro->KeyAt(0));// cur>bro == 1
         int pos = cmp > 0 ? bro->GetSize() - 1 : 0;
@@ -115,6 +115,8 @@ class BPlusTreeLeafPage : public BPlusTreePage {
     }
   }
  private:
+  //using to update child's parent
+  BufferPoolManager *buffer_pool_manager_;
   page_id_t next_page_id_;
   // Flexible array member for page data.
   MappingType array_[1];

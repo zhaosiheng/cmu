@@ -30,13 +30,14 @@ namespace bustub {
  * next page id and set max size
  */
 INDEX_TEMPLATE_ARGUMENTS
-void B_PLUS_TREE_LEAF_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, int max_size) {
+void B_PLUS_TREE_LEAF_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id, int max_size, BufferPoolManager *manager) {
   SetPageId(page_id);
   SetParentPageId(parent_id);
   SetMaxSize(max_size);
   SetPageType(IndexPageType::LEAF_PAGE);
   SetNextPageId(INVALID_PAGE_ID);
   SetSize(0);
+  this->buffer_pool_manager_ = manager;
 }
 
 /**
