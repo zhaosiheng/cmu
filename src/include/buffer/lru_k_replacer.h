@@ -83,7 +83,7 @@ public:
 		tar->next = second;
 		//
 		if(tar->times >=k){
-			std::cout<<"tar:"<<tar->times<<"k:"<<k;
+			
 			return;
 		}
 		if (queue == first) {
