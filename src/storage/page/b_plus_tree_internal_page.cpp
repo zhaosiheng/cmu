@@ -64,14 +64,15 @@ INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType {
   if(index < GetSize()){
     //update child page's parent
+    auto rs = array_[index].second;
     Page *child;
     if(!(child = this->buffer_pool_manager_->FetchPage(array_[index].second))){
       return -1;
-    }/*
+    }
     BPlusTreePage *child_page = reinterpret_cast<BPlusTreePage*>(child->GetData());
     child_page->SetParentPageId(GetPageId());
-    this->buffer_pool_manager_->UnpinPage(array_[index].second, false);*/
-    return array_[index].second;
+    this->buffer_pool_manager_->UnpinPage(array_[index].second, true);
+    return rs;
   }
   return 0;
 }

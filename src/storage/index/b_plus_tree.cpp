@@ -140,7 +140,7 @@ typename BPLUSTREE_TYPE::InternalPage* BPLUSTREE_TYPE::new_internal_page(page_id
   assert(page != nullptr);
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::InternalPage*>(page->GetData());
   cur_page->Init(nid, parent, internal_max_size_, buffer_pool_manager_);
-  buffer_pool_manager_->UnpinPage(nid, false);
+  buffer_pool_manager_->UnpinPage(nid, true);
   return cur_page;
 }
 /*my function*/
@@ -152,7 +152,7 @@ typename BPLUSTREE_TYPE::LeafPage* BPLUSTREE_TYPE::new_leaf_page(page_id_t &Self
   auto cur_page = reinterpret_cast<BPLUSTREE_TYPE::LeafPage*>(page->GetData());
   cur_page->Init(SelfId, ParentId, leaf_max_size_);
   cur_page->SetNextPageId(NextPageId);
-  buffer_pool_manager_->UnpinPage(SelfId, false);
+  buffer_pool_manager_->UnpinPage(SelfId, true);
   
   return cur_page;
 }
