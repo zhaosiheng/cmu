@@ -87,6 +87,7 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t pid) -> Page * {
   }
   Page *p = &pages_[fid];
   page_table_->Insert(pid , fid);
+  std::cout<<"here";
   p->pin_count_ = 1;
   p->page_id_ = pid;
   p->is_dirty_ = false;
