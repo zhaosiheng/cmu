@@ -84,6 +84,7 @@ public:
     UpdateRootPageId(true);
   }
   void set_leaf_next(page_id_t CurPageId, page_id_t NextPageId);
+  BufferPoolManager *buffer_pool_manager_;
  private:
   void UpdateRootPageId(int insert_record = 0);
 
@@ -95,7 +96,7 @@ public:
   // member variable
   std::string index_name_;
   page_id_t root_page_id_;
-  BufferPoolManager *buffer_pool_manager_;
+  
   KeyComparator comparator_;
   int leaf_max_size_;
   int internal_max_size_;
