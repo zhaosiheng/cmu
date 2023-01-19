@@ -76,6 +76,7 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t pid) -> Page * {
   if(page_table_->Find(pid , fid)){
     std::cout<<"(here)";
     replacer_->RecordAccess(fid);
+    std::cout<<"(where)";
     replacer_->SetEvictable(fid , false);
     pages_[fid].pin_count_++;
     return &pages_[fid];
