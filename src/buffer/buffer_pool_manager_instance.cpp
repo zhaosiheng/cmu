@@ -73,6 +73,7 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t pid) -> Page * {
   std::scoped_lock lock{latch_};
   frame_id_t fid;
   if(page_table_->Find(pid , fid)){
+    std::cout<<"here";
     replacer_->RecordAccess(fid);
     replacer_->SetEvictable(fid , false);
     pages_[fid].pin_count_++;
@@ -87,7 +88,7 @@ auto BufferPoolManagerInstance::FetchPgImp(page_id_t pid) -> Page * {
   }
   Page *p = &pages_[fid];
   page_table_->Insert(pid , fid);
-  std::cout<<"here";
+  
   p->pin_count_ = 1;
   p->page_id_ = pid;
   p->is_dirty_ = false;
