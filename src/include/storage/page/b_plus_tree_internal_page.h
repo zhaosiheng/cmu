@@ -195,9 +195,9 @@ class BPlusTreeInternalPage : public BPlusTreePage {
       if(bro->GetSize() + GetSize() <= GetMaxSize()){
         int size = bro->GetSize();
         for(int i=0;i<size;i++){
-          bro->IncreaseSize(-1);
           _insert_key(bro->KeyAt(i), bro->ValueAt(i), comparator, tree);
         }
+        bro->IncreaseSize(-1*size);
         parent->remove(bro->GetPageId(), comparator, tree);
         buffer_pool_manager_->DeletePage(bro->GetPageId());
       }else{//lend:cur<<<-bro

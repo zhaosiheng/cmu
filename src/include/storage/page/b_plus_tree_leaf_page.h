@@ -99,9 +99,9 @@ class BPlusTreeLeafPage : public BPlusTreePage {
       if(bro->GetSize() + GetSize() < GetMaxSize()){
         int size = bro->GetSize();
         for(int i=0;i<size;i++){//i=0 insert may trap updating
-          bro->IncreaseSize(-1);
           insert(bro->KeyAt(i), bro->ValueAt(i), comparator, tree);
         }
+        bro->IncreaseSize(-1*size);
         //if(GetNextPageId() == bro->GetPageId()) SetNextPageId(bro->GetNextPageId());
         
         parent->remove(bro->GetPageId(), comparator, tree);
