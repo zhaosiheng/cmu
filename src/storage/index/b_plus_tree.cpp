@@ -89,7 +89,7 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   page_id_t pid;
   if(IsEmpty()){
     
-    auto cur_page = new_leaf_page(pid, INVALID_PAGE_ID, INVALID_PAGE_ID, buffer_pool_manager_);
+    auto cur_page = new_leaf_page(pid, INVALID_PAGE_ID, INVALID_PAGE_ID);
     //update_root
     Update_root(pid);
   }else{
