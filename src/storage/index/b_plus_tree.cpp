@@ -88,8 +88,11 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
   Page *page;
   page_id_t pid;
   if(IsEmpty()){
+    page = buffer_pool_manager_->NewPage(&pid);
+    assert(page != nullptr);
+    auto cur_page = reinterpret_cast<LeafPage*>(page->GetData());
+    cur_page->Init(pid, INVALID_PAGE_ID, leaf_max_size_, buffer_pool_manager_);
     
-    auto cur_page = new_leaf_page(pid, INVALID_PAGE_ID, INVALID_PAGE_ID);
     //update_root
     Update_root(pid);
   }else{
