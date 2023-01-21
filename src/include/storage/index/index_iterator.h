@@ -43,7 +43,7 @@ class IndexIterator {
 
   auto operator*() -> const MappingType &{
     if(!leaf) return {};
-    return leaf->{KeyAt(pos), ValueAt(pos)};
+    return {leaf->KeyAt(pos), leaf->ValueAt(pos)};
   }
 
   auto operator++() -> IndexIterator &{
