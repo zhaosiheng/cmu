@@ -23,14 +23,14 @@ INDEX_TEMPLATE_ARGUMENTS
 class IndexIterator {
  public:
   // you may define your own constructor based on your member variables
-  IndexIterator(BPlusTree<KeyType, ValueType, KeyComparator>* t):{
+  IndexIterator(BPlusTree<KeyType, ValueType, KeyComparator>* t){
     this->tree = t;
     this->buffer_pool_manager_ = t->get_buffer();
     if(t->IsEmpty()){
       this->leaf_page = nullptr;
       this->pt = 0;
     }else{
-      
+
     }
 
   }
