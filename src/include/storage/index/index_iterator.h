@@ -26,7 +26,9 @@ class IndexIterator {
   IndexIterator();
   ~IndexIterator();  // NOLINT
 
-  auto IsEnd() -> bool;
+  auto IsEnd() -> bool{
+    return pt->GetNextPageId() == INVALID_PAGE_ID;
+  }
 
   auto operator*() -> const MappingType &;
 
@@ -38,6 +40,8 @@ class IndexIterator {
 
  private:
   // add your own private member variables here
+  BPlusTreeLeafPage<KeyType, ValueType, KeyComparator> *pt;
+
 };
 
 }  // namespace bustub
