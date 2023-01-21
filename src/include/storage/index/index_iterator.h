@@ -23,16 +23,30 @@ INDEX_TEMPLATE_ARGUMENTS
 class IndexIterator {
  public:
   // you may define your own constructor based on your member variables
-  IndexIterator();
-  ~IndexIterator();  // NOLINT
+  IndexIterator(BPlusTree<KeyType, ValueType, KeyComparator>* t):{
+    this->tree = t;
+    this->buffer_pool_manager_ = t->get_buffer();
+    if(t->IsEmpty()){
+      this->leaf_page = nullptr;
+      this->pt = 0;
+    }else{
+      
+    }
+
+  }
+  ~IndexIterator(){}  // NOLINT
 
   auto IsEnd() -> bool{
     return pt->GetNextPageId() == INVALID_PAGE_ID;
   }
 
-  auto operator*() -> const MappingType &;
+  auto operator*() -> const MappingType &{
+    return pt->
+  }
 
-  auto operator++() -> IndexIterator &;
+  auto operator++() -> IndexIterator &{
+    
+  }
 
   auto operator==(const IndexIterator &itr) const -> bool { throw std::runtime_error("unimplemented"); }
 
@@ -40,8 +54,10 @@ class IndexIterator {
 
  private:
   // add your own private member variables here
-  BPlusTreeLeafPage<KeyType, ValueType, KeyComparator> *pt;
-
+  BPlusTree<KeyType, ValueType, KeyComparator> *tree;
+  BufferPoolManager *buffer_pool_manager_;
+  BPlusTreeLeafPage<KeyType, ValueType, KeyComparator> *leaf;
+  int pt;
 };
 
 }  // namespace bustub

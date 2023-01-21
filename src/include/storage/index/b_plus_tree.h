@@ -84,7 +84,7 @@ public:
     UpdateRootPageId(true);
   }
   void set_leaf_next(page_id_t CurPageId, page_id_t NextPageId);
-  
+  BufferPoolManager* get_buffer(){ return buffer_pool_manager_;}
  private:
   void UpdateRootPageId(int insert_record = 0);
 
