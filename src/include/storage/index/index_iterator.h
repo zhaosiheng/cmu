@@ -26,10 +26,11 @@ class IndexIterator {
   IndexIterator(BPlusTree<KeyType, ValueType, KeyComparator>* t){
     this->tree = t;
     this->buffer_pool_manager_ = t->get_buffer();
+    this->pos = 0;
     if(t->IsEmpty()){
       this->leaf_page = nullptr;
-      this->pt = 0;
     }else{
+      this->leaf = t->get_first_leaf();
 
     }
 
@@ -37,11 +38,12 @@ class IndexIterator {
   ~IndexIterator(){}  // NOLINT
 
   auto IsEnd() -> bool{
-    return pt->GetNextPageId() == INVALID_PAGE_ID;
+    return leaf->GetNextPageId() == INVALID_PAGE_ID && pos == leaf->GetSize()-1;
   }
 
   auto operator*() -> const MappingType &{
-    return pt->
+    if(!leaf) return {};
+    return leaf->{KeyAt(pos), ValueAt(pos)};
   }
 
   auto operator++() -> IndexIterator &{
@@ -57,7 +59,7 @@ class IndexIterator {
   BPlusTree<KeyType, ValueType, KeyComparator> *tree;
   BufferPoolManager *buffer_pool_manager_;
   BPlusTreeLeafPage<KeyType, ValueType, KeyComparator> *leaf;
-  int pt;
+  int pos;
 };
 
 }  // namespace bustub
