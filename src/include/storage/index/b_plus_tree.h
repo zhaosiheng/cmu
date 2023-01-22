@@ -85,7 +85,7 @@ public:
   }
   void set_leaf_next(page_id_t CurPageId, page_id_t NextPageId);
   BufferPoolManager* get_buffer(){ return buffer_pool_manager_;}
-  LeafPage* get_first_leaf(KeyType key == {}){
+  LeafPage* get_first_leaf(KeyType key = {}){
     Page *page = buffer_pool_manager_->FetchPage(root_page_id_);
     BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
     buffer_pool_manager_->UnpinPage(root_page_id_, false);
