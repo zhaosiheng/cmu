@@ -41,7 +41,7 @@ class IndexIterator {
     if(t->IsEmpty()){
       this->leaf_page = nullptr;
     }else{
-      this->leaf = t->get_first_leaf(key);
+      this->leaf = t->get_leaf(key);
     }
   }
   ~IndexIterator(){}  // NOLINT
