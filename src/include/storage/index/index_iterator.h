@@ -33,7 +33,16 @@ class IndexIterator {
       this->leaf = t->get_first_leaf();
 
     }
-
+  }
+  IndexIterator(BPlusTree<KeyType, ValueType, KeyComparator>* t, KeyType key){
+    this->tree = t;
+    this->buffer_pool_manager_ = t->get_buffer();
+    this->pos = 0;
+    if(t->IsEmpty()){
+      this->leaf_page = nullptr;
+    }else{
+      this->leaf = t->get_first_leaf(key);
+    }
   }
   ~IndexIterator(){}  // NOLINT
 

@@ -85,13 +85,13 @@ public:
   }
   void set_leaf_next(page_id_t CurPageId, page_id_t NextPageId);
   BufferPoolManager* get_buffer(){ return buffer_pool_manager_;}
-  LeafPage* get_first_leaf(){
+  LeafPage* get_first_leaf(KeyType key == {}){
     Page *page = buffer_pool_manager_->FetchPage(root_page_id_);
     BPlusTreePage *t_page = reinterpret_cast<BPlusTreePage*>(page->GetData());
     buffer_pool_manager_->UnpinPage(root_page_id_, false);
     while(t_page->IsRootPage()){
       auto cur_page = reinterpret_cast<InternalPage*>(t_page);
-      page_id_t next_page_id = cur_page->ValueAt(0);
+      page_id_t next_page_id = key == {} ? cur_page->ValueAt(0) : cur_page->lookup(key, comparator_);
       if(!(page = buffer_pool_manager_->FetchPage(next_page_id))){
         return false;
       }
