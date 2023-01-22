@@ -56,7 +56,8 @@ class IndexIterator {
   }
 
   auto operator++() -> IndexIterator &{
-    
+    if(IsEnd()) return nullptr;
+    return nullptr;
   }
 
   auto operator==(const IndexIterator &itr) const -> bool { throw std::runtime_error("unimplemented"); }

@@ -231,7 +231,7 @@ auto BPLUSTREE_TYPE::Begin(const KeyType &key) -> INDEXITERATOR_TYPE { return IN
  * @return : index iterator
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto BPLUSTREE_TYPE::End() -> INDEXITERATOR_TYPE { return INDEXITERATOR_TYPE(this); }
+auto BPLUSTREE_TYPE::End() -> INDEXITERATOR_TYPE { return nullptr; }
 
 /**
  * @return Page id of the root of this tree
